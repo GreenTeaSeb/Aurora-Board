@@ -1,8 +1,9 @@
 use actix_files as fs;
+use actix_identity::{CookieIdentityPolicy, IdentityService};
 use actix_web::{
     middleware,
     web::{self, Data},
-    App, HttpRequest, HttpServer, Responder,
+    App, HttpRequest, HttpServer, Responder, services,
 };
 use anyhow::Result;
 use dotenv::dotenv;
@@ -33,19 +34,25 @@ async fn main() -> Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(Data::new(db_pool.clone()))
+            .wrap(IdentityService::new(
+		CookieIdentityPolicy::new(&[0;32]).name("id").secure(false)
+	    ))
             .wrap(middleware::Logger::default())
             .route("/search", web::get().to(search))
             .route("/search/{name}", web::get().to(search))
-            .route("/signup", web::post().to(handlers::user::signup))
-            .route("/login", web::post().to(handlers::user::login))
-            .route("/user/{id}", web::post().to(handlers::user::get))
-            .route("/home", web::route())
+            .service(services![
+		handlers::login::signup,
+		handlers::login::login,
+		handlers::login::logout,
+		handlers::login::login_pg,
+		handlers::login::signup_pg,
+		handlers::user::get,
+		handlers::home::home,
+	    ])
             .service(fs::Files::new("/css", "./css/").show_files_listing())
-            .default_service(
-                fs::Files::new("/home", "./static/")
-                    .index_file("index.html")
-                    .show_files_listing(),
-            )
+            .service(fs::Files::new("/data", "./data/").show_files_listing()) 
+            .service(fs::Files::new("/", "./static/").show_files_listing()) 
+       
     })
     .bind((host, port))?
     .run()

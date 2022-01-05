@@ -9,11 +9,13 @@
     <link
       href="https://fonts.googleapis.com/css2?family=Catamaran:wght@700;900&family=Poppins:wght@400;500;600&display=swap"
       rel="stylesheet"
-    />
-     </head>
+    />  </head>
   <body>
     <div id="display" class="">
-      <div id="content" class=""></div>
+     <% include!("./navbar.stpl"); %>
+      <div id="content" class="">
+	  
+      </div>
     </div>
   </body>
 </html>

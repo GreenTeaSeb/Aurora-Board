@@ -10,3 +10,21 @@ body {
   height: auto;
   margin: 0;
 }
+
+@mixin button{
+ 
+    font-family: "Catamaran", Sans-Serif;
+    color: $unfocused;
+    border-radius: 12px;
+    transition: 0.1s;
+    text-decoration: none;
+    height: inherit;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    &:hover{
+	color: $text;
+	transform: scale(1.1);
+    }
+    
+}

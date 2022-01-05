@@ -1,4 +1,3 @@
-
 @import "common";
 #topnav {
   filter: drop-shadow(0 0 0.75rem black);
@@ -16,10 +15,14 @@
   top: -$navbar-height - 1em;
   transition: 0.1s;
   #title {
-    color: $text;
-    font-family: "Catamaran", sans-serif;
-    font-size: xx-large;
     flex: 1;
+    z-index: 9;
+    a {
+      color: $text;
+      font-family: "Catamaran", sans-serif;
+      font-size: xx-large;
+      text-decoration: none;
+    }
   }
   #search {
     background-color: #303030;
@@ -51,11 +54,29 @@
     align-items: center;
     height: inherit;
     color: $text;
+    z-index: 9;
+    gap: 1rem;
+    flex: 1;
+    #username {
+      float: left;
+      color: $text;
+      font-family: "Catamaran", Sans-Serif;
+    }
+    a {
+      @include button;
+    }
+
+    #pfp {
+      height: 90%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: 360px;
+      box-shadow: 0 0 20px black;
+    }
     svg {
       height: inherit;
       scale: 0.6;
     }
-    flex: 1;
   }
   #dropdown-button {
     position: absolute;

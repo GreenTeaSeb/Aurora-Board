@@ -1,10 +1,17 @@
-const prevent = async (e) =>{
+const errors = document.getElementById("errors");
+const prevent =  (e) =>{
     e.preventDefault();
-const data = new URLSearchParams(new FormData(e.currentTarget));
-   let res = await fetch('/login',{
-	method: 'POST',
-	body: data
-    }).then(function(response) {
-	return response.text()}) 
-}
-document.forms["login"].addEventListener('submit', prevent)
+   fetch(e.target.action, {
+      method: 'POST',
+      body: new URLSearchParams(new FormData(e.target)) // event.target is the form
+   }).then(res => {
+       if(!res.ok)
+	   return res.text().then(text => {throw new Error(text)})
+       window.location.replace(res.url);
+   }).catch(err =>{
+       errors.innerText = err;
+   })
+     
+;}
+
+document.querySelector('form').addEventListener('submit', prevent)

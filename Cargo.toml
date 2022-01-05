@@ -1,3 +1,5 @@
+
+
 [package]
 name = "aurora-board"
 version = "0.1.0"
@@ -8,6 +10,7 @@ edition = "2021"
 [dependencies]
 actix-web = "4.0.0-beta.18"
 actix-files = "0.6.0-beta.12"
+actix-identity = "0.4.0-beta.7"
 log = "0.4.14"
 env_logger = "0.9.0"
 sailfish = "0.3.3"
@@ -16,4 +19,4 @@ sqlx = { version = "0.5.1", features = [ "runtime-actix-native-tls" , "mysql" ,"
 chrono =  { version = "0.4.15", features = ["serde"] }
 dotenv = "0.15.0"
 anyhow = "1.0.52"
-argonautica = "0.2.0"
+argonautica = { version = "0.2", features = ["simd"] }

@@ -1,4 +1,0 @@
-const prevent = (e) =>{
-  e.preventDefault();
-}
-document.forms["login"].addEventListener('submit', prevent)
