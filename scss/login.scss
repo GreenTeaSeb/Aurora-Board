@@ -1,0 +1,35 @@
+@import "common";
+
+#display {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  #content {
+    background: $unfocused;
+    border-radius: 12px;
+    height: 15rem;
+    width: 15rem;
+    #buttons {
+      display: flex;
+      justify-content: center;
+      a {
+        flex: 1;
+        text-align: center;
+        text-decoration: none;
+      }
+    }
+    #forms {
+      padding: 1rem;
+    }
+  }
+}
+
+form {
+  display: none;
+  &:target {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}

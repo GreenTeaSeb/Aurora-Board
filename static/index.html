@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Aurora Gallery</title>
+    <script src="main.js" type="module" defer></script>
+    <link rel="stylesheet" href="/css/style.css" />
+    <!-- text font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Catamaran:wght@700;900&family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <template id="tile-template">
+      <div class="tile rounded">
+        <img loading="lazy" />
+        <div class="spinner">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+        <div class="info">
+          <div class="button">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+              />
+            </svg>
+          </div>
+          <div class="button">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
+        </div>
+      </div>
+    </template>
+  </head>
+  <body>
+    <div class="modal">aaa</div>
+    <div id="display" class="">
+      <div id="topnav">
+        <div id="title">Aurora Board</div>
+        <div id="search">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          <input name="" value="" />
+        </div>
+        <div id="login">
+          <p class="">Username</p>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </div>
+        <div id="dropdown-button">
+          <svg
+            class="dropdown-bg"
+            width="60"
+            height="20"
+            viewBox="0 0 15.695 5.091"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentcolor"
+          >
+            <path
+              style="fill-rule: evenodd"
+              d="M104.014 67.501c9.315 1.9 11.047 11.846 19.439 13.098.894.186 1.993.165 2.764.22V67.502Zm44.405 0c-9.314 1.9-11.047 11.846-19.438 13.098-.895.186-1.994.165-2.764.22V67.502Z"
+              transform="matrix(.35345 0 0 .39282 -36.764 -26.586)"
+            />
+            <g>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+            </g>
+          </svg>
+        </div>
+      </div>
+      <div id="content" class=""></div>
+    </div>
+  </body>
+</html>
