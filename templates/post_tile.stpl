@@ -1,0 +1,19 @@
+<div class="tile">
+    <div class="header">	
+	<div class="info">
+	    <img class= "pfp"src="/data/defaults/default_pfp.webp" alt=""> 
+	    <p>Title</p>
+	</div>
+	<div class="text">
+	    <pre>Proin pharetra sodales eleifend. Aliquam erat volutpat. Sed sit amet elit dictum, tempus nibh eget, lacinia nisi. Phasellus in nunc et est fringilla vulputate vitae quis tortor. Phasellus gravida libero vitae urna gravida euismod. Nullam sem sem, varius tincidunt urna nec, imperdiet iaculis lacus. Aliquam interdum feugiat convallis. Sed quis velit eget magna malesuada sagittis. Nulla a dolor hendrerit, finibus ex placerat, laoreet massa. Mauris velit tortor, ornare id pharetra volutpat, cursus et turpis. Aenean sit amet leo quis diam mollis ornare et non sem. Nam porttitor dolor lectus, vel suscipit tortor euismod id. Duis auctor neque at convallis finibus. Morbi id est vitae massa accumsan accumsan ac nec neque. In sed ornare leo. Sed tincidunt, dui non molestie lacinia, lectus lacus ornare massa, eget luctus ligula quam at mi.
+
+Etiam erat risus, euismod sed iaculis id, facilisis ac arcu. Nulla aliquet tincidunt arcu, eget porttitor felis lobortis quis. Duis tincidunt leo in facilisis suscipit. Donec dignissim dui a eleifend dictum. Nullam condimentum sagittis sapien, id fringilla eros. Nulla facilisi. Interdum et malesuada fames ac ante ipsum primis in faucibus. Fusce dignissim dui at tellus euismod fringilla. Nulla eget leo turpis. Integer maximus ex sed odio accumsan sodales. Integer eget felis lorem. Pellentesque vehicula interdum est. Proin pretium feugiat placerat.
+
+Mauris id turpis ac lacus cursus mollis. Aliquam vestibulum cursus mauris, et tempor risus pretium eget. Integer mollis augue sed eros elementum aliquet. Proin eget posuere odio. Proin tellus nibh, volutpat ac dui vel, tristique tempus sem. Aliquam posuere iaculis purus quis ullamcorper. Duis maximus, lorem ut faucibus efficitur, lectus nunc pretium orci, ac fermentum purus metus et lectus. Duis erat elit, rhoncus et dapibus a, volutpat vitae leo. Nunc imperdiet ipsum sit amet ligula scelerisque, eu iaculis odio mollis. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Fusce augue nulla, euismod sed nibh a, condimentum volutpat nulla. Praesent ac blandit elit. Aliquam a justo eget neque dictum varius. Nullam molestie venenatis lorem et scelerisque.
+
+Duis gravida cursus ipsum. In commodo risus ex, a malesuada nibh lobortis eu. Aenean nec orci non dolor ultricies commodo ac non dolor. Etiam sed magna eros. Duis arcu leo, ullamcorper non eros ac, interdum consequat est. Fusce vulputate, purus quis faucibus rutrum, est mi efficitur felis, eget convallis risus turpis ut mi. Aenean ornare, urna ac consequat ornare, massa nisi tempor purus, nec tincidunt massa lectus sed risus. Proin lacus tortor, cursus eu venenatis in, ultrices ac erat. 
+	    </pre>
+	</div>
+    </div>
+    <img src="https://picsum.photos/3900/3000?random=1" alt="" onload=>	
+</div>

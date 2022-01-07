@@ -1,12 +1,37 @@
 @import "tile";
 @import "common";
 @import "navbar";
+@include main;
 #display {
   height: inherit;
   display: flex;
   justify-content: center;
   flex-direction: column;
   align-items: center;
+
+  #content {
+    display: flex;
+    width: 100%;
+
+    #posts {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin: $margin;
+      gap: 2rem;
+    }
+    #sidebar {
+	margin: $margin;
+	width: 20rem;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+    }
+  }
+}
+.button{
+    @include button;
 }
 
 .modal {
@@ -30,11 +55,6 @@
     transition: 0.5s;
   }
 }
-
-#content {
-  margin: 2rem;
-}
-
 .spinner {
   position: absolute;
   top: 50%;

@@ -1,7 +1,7 @@
 @import "common";
 #topnav {
   filter: drop-shadow(0 0 0.75rem black);
-  background-color: $bg;
+  background-color: $navbar;
   display: flex;
   align-items: stretch;
   justify-content: center;
@@ -9,8 +9,8 @@
   align-self: stretch;
   position: sticky;
   height: $navbar-height;
-  padding: 12px;
-  gap: 12px;
+  padding: 0.5rem;
+  gap: 1rem;
   z-index: 9;
   top: -$navbar-height - 1em;
   transition: 0.1s;

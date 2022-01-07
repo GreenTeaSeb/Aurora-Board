@@ -21,18 +21,7 @@
            </div>
 	   <div id="sidebar">
 	     <div id="top">
-	       <ol>
-		 <li>a</li>
-		 <li>a</li>
-		 <li>a</li>
-		 <li>a</li>
-		 <li>a</li>
-		 <li>a</li>
-		 <li>a</li>
-		 <li>a</li>
-		 <li>a</li>
-		 <li>a</li>
-	       </ol>
+	       <%= board.name %>
 	     </div>	
 	     <div id="options">
 	       <a href="/newboard" class ="button">New board</a>
