@@ -5,7 +5,7 @@ use actix_web::{self, get, post, web, HttpResponse, Responder};
 use anyhow::{anyhow, Result};
 use argonautica::{Hasher, Verifier};
 use serde::{Deserialize, Serialize};
-use sqlx::{MySqlPool};
+use sqlx::MySqlPool;
 use std::env;
 
 #[derive(Serialize)]

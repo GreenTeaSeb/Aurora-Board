@@ -4,7 +4,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Aurora Board</title>
-    <script src="main.js" type="module" defer></script>
     <link rel="stylesheet" href="/css/home.css" />
     <!-- text font -->
     <link
@@ -25,15 +24,14 @@
 		 <% for board in &top_boards { %>
 		 <li>
 		   <div class = "entry">
-		     <a class="name" href= <%= format!("/board/{}",board.name) %> > <%= board.name %> </a>
+		     <a class="name" href= <%= format!("\"/b/{}\"",board.name) %> > <%= board.name %> </a>
 		     <p class="count"> <%= board.member_count %> <p> </div>
 		 </li>
 		 <% } %>
 	       </ol>
 	     </div>	
 	     <div id="options">
-	       <a href="/newboard" class ="button">New board</a>
-	       <a class ="button">New post</a>
+	       <a href="/new/board" class ="button">New board</a>
 	     </div>
 	    </div>
 	</div>

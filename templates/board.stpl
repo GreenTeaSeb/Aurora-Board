@@ -4,7 +4,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title><%= board.name%></title>
-    <script src="main.js" type="module" defer></script>
     <link rel="stylesheet" href="/css/home.css" />
     <!-- text font -->
     <link
@@ -26,15 +25,15 @@
 	     </div>	
 	     <div id="options">
 	       <% if !is_in { %>
-	       <form action =  <%= format!("{}/join", board.name) %> method = "post"  >
+	       <form action =  <%= format!("\"{}/join\"", board.name) %> method = "post"  >
 		 <input type="submit" value="join" class ="button"/>
 	       </form>
 	       <%} else { %>
-	       <form action =  <%= format!("{}/leave", board.name) %> method = "post"  >
+	       <form action =  <%= format!("\"{}/leave\"", board.name) %> method = "post"  >
 		 <input type="submit" value="leave" class ="button"/>
 	       </form>
 	       <% } %>
-	       <a href="/newboard" class ="button">New board</a>
+	       <a href="/new/board" class ="button">New board</a>
 	       <a class ="button">New post</a>
 	     </div>
 	    </div>

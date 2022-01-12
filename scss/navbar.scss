@@ -35,16 +35,22 @@
     &:focus-within {
       color: $text;
     }
-    svg {
-      scale: 0.6;
-    }
     input {
       background-color: transparent;
       color: inherit;
       border: none;
-      width: 100%;
+      flex: 1;
       &:focus {
         outline: none;
+      }
+    }
+    button {
+      aspect-ratio: 1;
+      border: none;
+      background: transparent;
+      color: inherit;
+      svg {
+        padding: 0.5rem;
       }
     }
   }
@@ -72,10 +78,6 @@
       object-fit: cover;
       border-radius: 360px;
       box-shadow: 0 0 20px black;
-    }
-    svg {
-      height: inherit;
-      scale: 0.6;
     }
   }
   #dropdown-button {

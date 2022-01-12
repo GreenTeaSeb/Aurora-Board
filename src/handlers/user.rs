@@ -72,11 +72,17 @@ pub fn check_if_logged_in(id: Option<String>) -> Result<u64> {
     Ok(id)
 }
 
-pub async fn check_if_joined_board(id: u64, board: &str, pool: &MySqlPool) -> Result<bool>{
-   Ok(sqlx::query!(
-	r#"
+pub async fn check_if_joined_board(id: u64, board: &str, pool: &MySqlPool) -> Result<bool> {
+    Ok(sqlx::query!(
+        r#"
 SELECT count(*) AS is_in FROM members
 WHERE board_id = (SELECT id FROM boards WHERE name = ?) AND user_id = ?
-"#, board, id
-    ).fetch_one(pool).await?.is_in != 0)
+"#,
+        board,
+        id
+    )
+    .fetch_one(pool)
+    .await?
+    .is_in
+        != 0)
 }

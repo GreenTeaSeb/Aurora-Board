@@ -25,7 +25,7 @@ pub struct NewBoardData {
     desc: String,
 }
 
-#[get("/newboard")]
+#[get("/board")]
 pub async fn newboard_pg(id: Identity) -> std::io::Result<fs::NamedFile> {
     if id.identity().is_none() {
         return fs::NamedFile::open("./static/login.html");
@@ -62,7 +62,7 @@ async fn create_board(id: u64, form: NewBoardData, pool: &MySqlPool) -> Result<S
     }
 }
 
-#[post("/newboard")]
+#[post("/board")]
 pub async fn newboard(
     id: Identity,
     form: web::Form<NewBoardData>,
@@ -78,7 +78,7 @@ pub async fn newboard(
     };
     match create_board(id_int, form.into_inner(), pool.as_ref()).await {
         Ok(id) => HttpResponse::Found()
-            .append_header(("location", format!("/board/{}", id)))
+            .append_header(("location", format!("/b/{}", id)))
             .finish(),
         Err(e) => HttpResponse::UnprocessableEntity().body(e.to_string()),
     }
@@ -102,11 +102,10 @@ pub async fn get_by_name(name: &str, pool: &MySqlPool) -> Result<Board> {
 struct BoardTemplate {
     board: Board,
     user: anyhow::Result<User>,
-    is_in: bool
+    is_in: bool,
 }
 
-
-#[get("/board/{name}")]
+#[get("{name}")]
 pub async fn board_pg(id: Identity, req: HttpRequest, pool: web::Data<MySqlPool>) -> HttpResponse {
     let board = req.match_info().get("name").ok_or("").unwrap_or_default();
     let user_id_int: u64 = id
@@ -121,7 +120,9 @@ pub async fn board_pg(id: Identity, req: HttpRequest, pool: web::Data<MySqlPool>
             let temp = BoardTemplate {
                 user: user_data,
                 board: b,
-		is_in: check_if_joined_board(user_id_int, board, pool.get_ref()).await.unwrap_or_default()
+                is_in: check_if_joined_board(user_id_int, board, pool.get_ref())
+                    .await
+                    .unwrap_or_default(),
             };
             HttpResponse::Ok().body(temp.render_once().unwrap())
         }
@@ -157,8 +158,7 @@ DELETE FROM members where user_id = ? and  (select id from boards where name = ?
     Ok(())
 }
 
-
-#[post("/board/{name}/join")]
+#[post("{name}/join")]
 pub async fn join_board(
     id: Identity,
     pool: web::Data<MySqlPool>,
@@ -177,14 +177,14 @@ pub async fn join_board(
     if get_by_name(board, pool.get_ref()).await.is_ok() {
         user_join(&id, board, pool.get_ref()).await;
         return HttpResponse::Found()
-            .append_header(("location", format!("/board/{}", board)))
+            .append_header(("location", format!("/b/{}", board)))
             .finish();
     }
 
     HttpResponse::NotFound().body("Board doesn't exist")
 }
 
-#[post("/board/{name}/leave")]
+#[post("{name}/leave")]
 pub async fn leave_board(
     id: Identity,
     pool: web::Data<MySqlPool>,
@@ -203,7 +203,7 @@ pub async fn leave_board(
     if get_by_name(board, pool.get_ref()).await.is_ok() {
         user_leave(&id, board, pool.get_ref()).await;
         return HttpResponse::Found()
-            .append_header(("location", format!("/board/{}", board)))
+            .append_header(("location", format!("/b/{}", board)))
             .finish();
     }
 

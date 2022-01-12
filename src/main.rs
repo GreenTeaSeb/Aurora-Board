@@ -1,9 +1,9 @@
 use actix_files as fs;
 use actix_identity::{CookieIdentityPolicy, IdentityService};
 use actix_web::{
-    middleware, services,
+    middleware::{self, ErrorHandlerResponse}, services,
     web::{self, Data},
-    App, HttpRequest, HttpServer, Responder,
+    App, HttpRequest, HttpServer, Responder, dev,
 };
 use anyhow::Result;
 use dotenv::dotenv;
@@ -11,15 +11,10 @@ use sqlx::MySqlPool;
 use std::env;
 mod handlers;
 
-async fn search(req: HttpRequest) -> impl Responder {
-    let params = req.match_info().get("name").unwrap_or("World!");
-    format!("You searched for {}", params)
-}
 
 #[actix_web::main]
 async fn main() -> Result<()> {
     dotenv().ok();
-    env_logger::init();
     let database_url = env::var("DATABASE_URL").expect("DATABASE is not set");
     let host = env::var("HOST").expect("HOST ip is not set");
     let port = env::var("PORT")
@@ -34,8 +29,6 @@ async fn main() -> Result<()> {
                 CookieIdentityPolicy::new(&[0; 32]).name("id").secure(false),
             ))
             .wrap(middleware::Logger::default())
-            .route("/search", web::get().to(search))
-            .route("/search/{name}", web::get().to(search))
             .service(services![
                 handlers::login::signup,
                 handlers::login::login,
@@ -44,12 +37,19 @@ async fn main() -> Result<()> {
                 handlers::login::signup_pg,
                 handlers::user::get,
                 handlers::home::home,
-                handlers::board::newboard_pg,
-                handlers::board::newboard,
-                handlers::board::board_pg,
-                handlers::board::join_board,
-                handlers::board::leave_board,
-            ])
+               
+            ]).service(web::scope("/b").service(
+		services![
+		    handlers::board::board_pg,
+		    handlers::board::join_board,
+		    handlers::board::leave_board,
+		]
+	    )).service(web::scope("/new").service(
+		services![
+		    handlers::board::newboard_pg,
+		    handlers::board::newboard,
+		]
+	    ))
             .service(fs::Files::new("/css", "./css/").show_files_listing())
             .service(fs::Files::new("/data", "./data/").show_files_listing())
             .service(fs::Files::new("/", "./static/").show_files_listing())
