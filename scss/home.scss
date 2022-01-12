@@ -23,10 +23,40 @@
     }
     #sidebar {
 	margin: $margin;
+	margin-top: 5rem;
 	width: 20rem;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	#top{
+	    ol{
+		
+	    padding: 0;
+	    }
+	    li{
+		color: white; 
+	    .entry{
+		display: flex;
+		align-items: center;
+		.name{
+
+		color: white; 
+		    flex:1;
+		}
+		.count{
+		    float: left;
+		    margin-left: 1rem;
+		}
+	    }
+	    }
+	}
+	#options{
+	    input{
+		border: none;
+		background: none;
+		width: 100%;
+	    }
+	}
     }
   }
 }

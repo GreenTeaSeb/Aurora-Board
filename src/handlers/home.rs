@@ -8,6 +8,23 @@ use sqlx::MySqlPool;
 #[template(path = "home.stpl", escape = false)]
 struct HomeTemplate {
     user: anyhow::Result<User>,
+    top_boards: Vec<BoardEntry>,
+}
+
+struct BoardEntry {
+    name: String,
+    member_count: u64 ,
+}
+
+async fn get_top(pool: &MySqlPool) -> Result<Vec<BoardEntry>, sqlx::Error> {
+    sqlx::query_as!(BoardEntry, r#"
+   SELECT boards.name, cast(count(members.board_id) as UNSIGNED) as member_count  from boards
+left join members
+on boards.id = members.board_id
+group by boards.id
+order by member_count desc
+limit 10;"#
+    ).fetch_all(pool).await
 }
 
 #[get("/")]
@@ -18,6 +35,10 @@ pub async fn home(id: Identity, pool: web::Data<MySqlPool>) -> HttpResponse {
         .parse()
         .unwrap_or_default();
     let user_res = get_by_id(&id_int, pool.get_ref()).await;
-    let temp = HomeTemplate { user: user_res };
+    let top: Vec<BoardEntry> =  get_top(pool.get_ref()).await.unwrap_or_default();
+    let temp = HomeTemplate {
+        user: user_res,
+        top_boards: top,
+    };
     HttpResponse::Ok().body(temp.render_once().unwrap())
 }

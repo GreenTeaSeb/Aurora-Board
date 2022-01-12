@@ -47,6 +47,8 @@ async fn main() -> Result<()> {
                 handlers::board::newboard_pg,
                 handlers::board::newboard,
                 handlers::board::board_pg,
+                handlers::board::join_board,
+                handlers::board::leave_board,
             ])
             .service(fs::Files::new("/css", "./css/").show_files_listing())
             .service(fs::Files::new("/data", "./data/").show_files_listing())

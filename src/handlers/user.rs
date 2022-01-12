@@ -1,11 +1,10 @@
 use actix_identity::Identity;
 use actix_web::{get, web, HttpRequest, HttpResponse};
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use sailfish::TemplateOnce;
-use serde::Serialize;
-use sqlx::{FromRow, MySqlPool};
+use sqlx::MySqlPool;
 
-#[derive(Serialize, FromRow, Debug)]
+#[derive(Debug)]
 pub struct User {
     pub id: u32,
     pub username: String,
@@ -42,7 +41,6 @@ pub async fn get(id: Identity, req: HttpRequest, pool: web::Data<MySqlPool>) -> 
     let id_guest = req.match_info().get("id").ok_or("no such id");
     let id_guest_int: u64 = id_guest.unwrap_or_default().parse().unwrap_or_default();
     let user_guest_data = get_by_id(&id_guest_int, pool.get_ref()).await;
-
     let id_int: u64 = id
         .identity()
         .unwrap_or_default()
@@ -56,8 +54,29 @@ pub async fn get(id: Identity, req: HttpRequest, pool: web::Data<MySqlPool>) -> 
                 user: user_data,
                 user_guest: u,
             };
+
             HttpResponse::Ok().body(temp.render_once().unwrap())
         }
         Err(_) => HttpResponse::NotFound().body("User doesn't exist"),
     }
+}
+
+pub fn check_if_logged_in(id: Option<String>) -> Result<u64> {
+    if id.is_none() {
+        return Err(anyhow!("Not logged in"));
+    }
+    let id: u64 = id.unwrap_or_default().parse().unwrap_or_default();
+    if id == 0 {
+        return Err(anyhow!("Not logged in"));
+    }
+    Ok(id)
+}
+
+pub async fn check_if_joined_board(id: u64, board: &str, pool: &MySqlPool) -> Result<bool>{
+   Ok(sqlx::query!(
+	r#"
+SELECT count(*) AS is_in FROM members
+WHERE board_id = (SELECT id FROM boards WHERE name = ?) AND user_id = ?
+"#, board, id
+    ).fetch_one(pool).await?.is_in != 0)
 }

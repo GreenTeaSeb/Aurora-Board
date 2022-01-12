@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Login Aurora Board</title>
-    <link rel="stylesheet" href="/css/style.css" />
+    <title>Aurora Board - <%=user_guest.username%></title>
+    <link rel="stylesheet" href="/css/home.css" />
     <!-- text font -->
     <link
       href="https://fonts.googleapis.com/css2?family=Catamaran:wght@700;900&family=Poppins:wght@400;500;600&display=swap"
@@ -13,8 +13,10 @@
   <body>
     <div id="display" class="">
      <% include!("./navbar.stpl"); %>
-      <div id="content" class="">
-	 TODO! 
+      <div id="content" class="">	
+	<pre style="color:white;white-space:pre-line;">
+	 <%= format!("{:?}", user_guest)%> 
+	 </pre>
       </div>
     </div>
   </body>

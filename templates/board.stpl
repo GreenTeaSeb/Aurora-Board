@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Aurora Board</title>
+    <title><%= board.name%></title>
     <script src="main.js" type="module" defer></script>
     <link rel="stylesheet" href="/css/home.css" />
     <!-- text font -->
@@ -18,12 +18,22 @@
      <% include!("./navbar.stpl"); %>
 	<div id="content" class="">
 	    <div id="posts">
+	      <% for _ in 0..10 { include!("./post_tile.stpl");  }%>
            </div>
 	   <div id="sidebar">
 	     <div id="top">
 	       <%= board.name %>
 	     </div>	
 	     <div id="options">
+	       <% if !is_in { %>
+	       <form action =  <%= format!("{}/join", board.name) %> method = "post"  >
+		 <input type="submit" value="join" class ="button"/>
+	       </form>
+	       <%} else { %>
+	       <form action =  <%= format!("{}/leave", board.name) %> method = "post"  >
+		 <input type="submit" value="leave" class ="button"/>
+	       </form>
+	       <% } %>
 	       <a href="/newboard" class ="button">New board</a>
 	       <a class ="button">New post</a>
 	     </div>

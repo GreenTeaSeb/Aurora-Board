@@ -22,16 +22,13 @@
 	   <div id="sidebar">
 	     <div id="top">
 	       <ol>
-		 <li>a</li>
-		 <li>a</li>
-		 <li>a</li>
-		 <li>a</li>
-		 <li>a</li>
-		 <li>a</li>
-		 <li>a</li>
-		 <li>a</li>
-		 <li>a</li>
-		 <li>a</li>
+		 <% for board in &top_boards { %>
+		 <li>
+		   <div class = "entry">
+		     <a class="name" href= <%= format!("/board/{}",board.name) %> > <%= board.name %> </a>
+		     <p class="count"> <%= board.member_count %> <p> </div>
+		 </li>
+		 <% } %>
 	       </ol>
 	     </div>	
 	     <div id="options">
