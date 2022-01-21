@@ -1,15 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+<% include!("./header.stpl"); %>
+	<!-- custom -->
     <title>Aurora Board - <%=user_guest.username%></title>
     <link rel="stylesheet" href="/css/home.css" />
-    <!-- text font -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Catamaran:wght@700;900&family=Poppins:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />  </head>
+ </head>
   <body>
     <div id="display" class="">
      <% include!("./navbar.stpl"); %>

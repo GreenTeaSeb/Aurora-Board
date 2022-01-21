@@ -1,7 +1,9 @@
 @import "common";
+@import "media_queries";
+
 #topnav {
   filter: drop-shadow(0 0 0.75rem black);
-  background-color: $navbar;
+  background-color: $primary;
   display: flex;
   align-items: stretch;
   justify-content: center;
@@ -10,7 +12,7 @@
   position: sticky;
   height: $navbar-height;
   padding: 0.5rem;
-  gap: 1rem;
+  gap: 2rem;
   z-index: 9;
   top: -$navbar-height - 1em;
   transition: 0.1s;
@@ -25,11 +27,15 @@
     }
   }
   #search {
-    background-color: #303030;
-    border-radius: 12px;
+    @include for_breakpoint(mobile) {
+      display: none;
+    }
+
+    background-color: $secondary;
+    border-radius: 360px;
     display: flex;
     flex: 3;
-    color: $unfocused;
+    color: $secondary-text;
     transition: 0.1s;
     z-index: 9;
     &:focus-within {
@@ -44,12 +50,17 @@
         outline: none;
       }
     }
-    button {
+    label {
       aspect-ratio: 1;
+    }
+    button {
       border: none;
       background: transparent;
       color: inherit;
+      height: 100%;
       svg {
+        height: 100%;
+        box-sizing: border-box;
         padding: 0.5rem;
       }
     }
@@ -89,7 +100,7 @@
       transition: 0.1s;
       g {
         transition: 0.1s;
-        color: $unfocused;
+        color: $secondary-text;
       }
       z-index: 8;
     }

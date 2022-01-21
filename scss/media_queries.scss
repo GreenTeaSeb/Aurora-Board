@@ -1,0 +1,21 @@
+$media_queries : (
+    'mobile' : unquote("only screen and (max-width:  630px)"),
+    'tablet' : unquote("only screen and (min-width: 631px ) and (max-width:  1023px)"),
+    'desktop' : unquote("only screen and (min-width:  1024px)"),
+);
+
+@mixin for_breakpoint($breakpoints) {
+    $conditions : ();
+    @each $breakpoint in $breakpoints {
+        $conditions: append(
+            $conditions,
+            #{inspect(map-get($media_queries, $breakpoint))},
+            comma
+        );
+    }
+
+    @media #{$conditions} {
+        @content;
+    }
+
+}

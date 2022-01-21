@@ -1,15 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+	<% include!("./header.stpl"); %>
+	<!-- custom -->
     <title>Aurora Board</title>
     <link rel="stylesheet" href="/css/home.css" />
-    <!-- text font -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Catamaran:wght@700;900&family=Merriweather+Sans:wght@300;400&display=swap"
-      rel="stylesheet"
-    />
      </head>
   <body>
     <div class="modal">aaa</div>

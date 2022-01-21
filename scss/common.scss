@@ -1,7 +1,9 @@
-$bg: #181818;
-$navbar: #202020;
+$bg: #202020;
 $text: #eeeeee;
-$unfocused: #505050;
+$secondary-text: #eeeeeeb3;
+$primary: #313131;
+$secondary: #202020;
+
 $margin: 2rem;
 $padding: 2rem;
 $navbar-height: 3em;
@@ -10,14 +12,15 @@ $navbar-height: 3em;
   body {
     background: $bg;
     background-attachment: fixed;
-    height: auto;
+    // height: 100vh;
     margin: 0;
+    // overflow: hidden;
   }
 }
 
 @mixin button {
   font-family: "Catamaran", Sans-Serif;
-  color: $unfocused;
+  color: $secondary-text;
   border-radius: 12px;
   transition: 0.1s;
   text-decoration: none;
