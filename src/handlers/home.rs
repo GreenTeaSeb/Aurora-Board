@@ -1,6 +1,6 @@
 use crate::handlers::user::{get_by_id, User};
 use actix_identity::Identity;
-use actix_web::{get, web, HttpResponse};
+use actix_web::{web, HttpResponse};
 use sailfish::TemplateOnce;
 use sqlx::MySqlPool;
 
@@ -31,7 +31,6 @@ limit 10;"#
     .await
 }
 
-#[get("/")]
 pub async fn home(id: Identity, pool: web::Data<MySqlPool>) -> HttpResponse {
     let id_int: u64 = id
         .identity()

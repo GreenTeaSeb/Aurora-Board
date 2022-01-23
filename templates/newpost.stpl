@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <% include!("./header.stpl"); %>
+     <link rel="stylesheet" type="text/css" href="/pell/dist/pell.min.css"> 
+     <link rel="stylesheet" type="text/css" href="/css/newpost.css">
+    <script type="module" src="/newpost.js"></script>
+    </head>
+  <body>
+    <div id="display" class="">
+
+     <% include!("./navbar.stpl"); %>
+      <div id="content" class="">
+	    <div id="editor" class="pell"></div>
+	<div>
+	  HTML output:
+	  <div id="html-output" style="white-space:pre-wrap;"></div>
+	      </div>
+	      </div>
+	    </div>
+
+  </body>
+
+</html>

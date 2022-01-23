@@ -20,11 +20,11 @@
 	     </div>	
 	     <div id="options">
 	       <% if !is_in { %>
-	       <form action =  <%= format!("\"{}/join\"", board.name) %> method = "post"  >
+	       <form action =  <%= format!("{}/join", board.name) %> method = "post"  >
 		 <input type="submit" value="join" class ="button"/>
 	       </form>
 	       <%} else { %>
-	       <form action =  <%= format!("\"{}/leave\"", board.name) %> method = "post"  >
+	       <form action =  <%= format!("{}/leave", board.name) %> method = "post"  >
 		 <input type="submit" value="leave" class ="button"/>
 	       </form>
 	       <% } %>

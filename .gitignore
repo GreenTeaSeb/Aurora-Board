@@ -2,4 +2,4 @@
 /css
 .env
 /data
-
+*.pem

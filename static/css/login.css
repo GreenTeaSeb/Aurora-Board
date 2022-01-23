@@ -1,0 +1,86 @@
+body {
+  background: #202020;
+  background-attachment: fixed;
+  margin: 0;
+}
+
+#display {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+#display #content {
+  background: #313131;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  box-shadow: 0 0 20px;
+}
+#display #content #title {
+  color: #eeeeee;
+  font-family: "Catamaran", Sans-Serif;
+  font-weight: 800;
+  font-size: 2rem;
+  padding: 2rem;
+}
+#display #content #info {
+  color: #eeeeee;
+  font-family: "Merriweather Sans", Sans-Serif;
+  font-size: 0.8rem;
+  padding: 2rem;
+}
+#display #content #submit {
+  font-family: "Merriweather Sans", Sans-Serif;
+  border: none;
+  padding: 0.5rem;
+  margin: 2rem;
+  width: 5rem;
+  border-radius: 12px;
+  transition: 0.1s;
+}
+#display #content #errors {
+  font-family: "Merriweather Sans", Sans-Serif;
+  color: #fa4164;
+}
+#display #content #inputs {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 2rem 0 2rem;
+  gap: 1rem;
+}
+#display #content #inputs label {
+  height: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #eeeeeeb3;
+  width: 100%;
+}
+#display #content #inputs label:focus-within {
+  color: #eeeeee;
+}
+#display #content #inputs label input,
+#display #content #inputs label textarea {
+  background: none;
+  outline: none;
+  border: none;
+  color: inherit;
+  transition: 0.1s;
+  font-family: "Catamaran", Sans-Serif;
+  font-weight: 600;
+  width: 100%;
+  font-size: small;
+}
+#display #content #inputs label textarea {
+  resize: none;
+}
+#display #content #inputs label svg {
+  height: 90%;
+  margin-right: 1rem;
+  transition: 0.1s;
+}
+
+/*# sourceMappingURL=login.css.map */

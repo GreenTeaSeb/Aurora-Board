@@ -1,6 +1,6 @@
 use actix_identity::Identity;
-use actix_web::{get, web, HttpRequest, HttpResponse};
-use anyhow::{anyhow, Result};
+use actix_web::{web, HttpRequest, HttpResponse};
+use anyhow::Result;
 use sailfish::TemplateOnce;
 use sqlx::MySqlPool;
 
@@ -19,7 +19,7 @@ pub struct User {
 #[derive(TemplateOnce)]
 #[template(path = "user.stpl", escape = false)]
 struct UserTemplate {
-    user: anyhow::Result<User>,
+    user: Result<User>,
     user_guest: User,
 }
 
@@ -36,7 +36,6 @@ pub async fn get_by_id(id: &u64, pool: &MySqlPool) -> Result<User> {
     .await?)
 }
 
-#[get("/user/{id}")]
 pub async fn get(id: Identity, req: HttpRequest, pool: web::Data<MySqlPool>) -> HttpResponse {
     let id_guest = req.match_info().get("id").ok_or("no such id");
     let id_guest_int: u64 = id_guest.unwrap_or_default().parse().unwrap_or_default();
@@ -59,17 +58,6 @@ pub async fn get(id: Identity, req: HttpRequest, pool: web::Data<MySqlPool>) -> 
         }
         Err(_) => HttpResponse::NotFound().body("User doesn't exist"),
     }
-}
-
-pub fn check_if_logged_in(id: Option<String>) -> Result<u64> {
-    if id.is_none() {
-        return Err(anyhow!("Not logged in"));
-    }
-    let id: u64 = id.unwrap_or_default().parse().unwrap_or_default();
-    if id == 0 {
-        return Err(anyhow!("Not logged in"));
-    }
-    Ok(id)
 }
 
 pub async fn check_if_joined_board(id: u64, board: &str, pool: &MySqlPool) -> Result<bool> {

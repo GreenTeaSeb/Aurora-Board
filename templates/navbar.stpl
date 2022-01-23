@@ -22,11 +22,11 @@
 	<p id="username"> <%= u.username %></p>
 	<img alt ="" src= <%= u.pfp %> id="pfp"/>
 	</a>
-	<a href="/logout">LOGOUT</a>
+	<a href="/user/logout">LOGOUT</a>
       
       <%}, Err(_) => { %>
-      <a href="/login">login</a>
-      <a href="/signup">sign up</a>
+      <a href="/user/login">login</a>
+      <a href="/user/signup">sign up</a>
       <%}}%>
     </div>
       </div>

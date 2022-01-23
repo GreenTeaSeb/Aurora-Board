@@ -1,0 +1,142 @@
+#topnav {
+  filter: drop-shadow(0 0 0.75rem black);
+  background-color: #313131;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  flex-direction: row;
+  align-self: stretch;
+  position: sticky;
+  height: 3em;
+  padding: 0.5rem;
+  gap: 2rem;
+  z-index: 9;
+  top: -4em;
+  transition: 0.1s;
+}
+#topnav #title {
+  flex: 1;
+  z-index: 9;
+}
+#topnav #title a {
+  color: #eeeeee;
+  font-family: "Catamaran", sans-serif;
+  font-size: xx-large;
+  text-decoration: none;
+}
+#topnav #search {
+  background-color: #202020;
+  border-radius: 360px;
+  display: flex;
+  flex: 3;
+  color: #eeeeeeb3;
+  transition: 0.1s;
+  z-index: 9;
+}
+@media only screen and (max-width: 630px) {
+  #topnav #search {
+    display: none;
+  }
+}
+#topnav #search:focus-within {
+  color: #eeeeee;
+}
+#topnav #search input {
+  background-color: transparent;
+  color: inherit;
+  border: none;
+  flex: 1;
+}
+#topnav #search input:focus {
+  outline: none;
+}
+#topnav #search label {
+  aspect-ratio: 1;
+}
+#topnav #search button {
+  border: none;
+  background: transparent;
+  color: inherit;
+  height: 100%;
+}
+#topnav #search button svg {
+  height: 100%;
+  box-sizing: border-box;
+  padding: 0.5rem;
+}
+#topnav #login {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  height: inherit;
+  color: #eeeeee;
+  z-index: 9;
+  gap: 1rem;
+  flex: 1;
+}
+#topnav #login #username {
+  float: left;
+  color: #eeeeee;
+  font-family: "Catamaran", Sans-Serif;
+}
+#topnav #login a {
+  font-family: "Catamaran", Sans-Serif;
+  color: #eeeeeeb3;
+  border-radius: 12px;
+  transition: 0.1s;
+  text-decoration: none;
+  height: inherit;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: medium;
+}
+#topnav #login a:hover {
+  color: #eeeeee;
+  transform: scale(1.1);
+}
+#topnav #login #pfp {
+  height: 90%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 360px;
+  box-shadow: 0 0 20px black;
+}
+#topnav #dropdown-button {
+  position: absolute;
+  bottom: -3em;
+  height: inherit;
+  color: #202020;
+  z-index: 9;
+}
+#topnav #dropdown-button .dropdown-bg {
+  transition: 0.1s;
+  z-index: 8;
+}
+#topnav #dropdown-button .dropdown-bg g {
+  transition: 0.1s;
+  color: #eeeeeeb3;
+}
+#topnav * {
+  font-family: "Fira Sans Condensed", sans-serif;
+  font-size: inherit;
+}
+#topnav:hover {
+  top: 0;
+}
+#topnav::after {
+  content: "";
+  position: absolute;
+  height: 8em;
+  width: 100%;
+  z-index: 8;
+}
+#topnav.visible {
+  top: 0;
+}
+#topnav.visible #dropdown-button g {
+  transform: scaleY(-1);
+  transform-origin: center;
+}
+
+/*# sourceMappingURL=navbar.css.map */

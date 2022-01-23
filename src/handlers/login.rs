@@ -1,9 +1,14 @@
 use crate::handlers::user::{get_by_id, User};
 use actix_files as fs;
 use actix_identity::Identity;
-use actix_web::{self, get, post, web, HttpResponse, Responder};
+use actix_web::{
+    self,
+    web::{self, Query},
+    HttpResponse, Responder,
+};
 use anyhow::{anyhow, Result};
 use argonautica::{Hasher, Verifier};
+use sailfish::TemplateOnce;
 use serde::{Deserialize, Serialize};
 use sqlx::MySqlPool;
 use std::env;
@@ -24,6 +29,17 @@ pub struct SignupData {
 pub struct LoginData {
     email: String,
     password: String,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct LoginQuery {
+    redirect: Option<String>,
+}
+
+#[derive(TemplateOnce)]
+#[template(path = "login.stpl", escape = false)]
+struct LoginTemplate {
+    redirect_path: String,
 }
 
 async fn new_user(form: SignupData, pool: &MySqlPool) -> Result<User> {
@@ -103,7 +119,6 @@ async fn login_user(form: LoginData, pool: &MySqlPool) -> Result<User> {
     }
 }
 
-#[post("/signup")]
 pub async fn signup(
     id: Identity,
     form: web::Form<SignupData>,
@@ -120,24 +135,23 @@ pub async fn signup(
     }
 }
 
-#[post("/login")]
 pub async fn login(
     id: Identity,
     form: web::Form<LoginData>,
     db_pool: web::Data<MySqlPool>,
+    Query(q): Query<LoginQuery>,
 ) -> impl Responder {
     match login_user(form.into_inner(), db_pool.as_ref()).await {
         Ok(t) => {
             id.remember(t.id.to_string());
             HttpResponse::Found()
-                .append_header(("location", "/"))
+                .append_header(("location", q.redirect.unwrap_or(String::from("/"))))
                 .finish()
         }
         Err(e) => HttpResponse::UnprocessableEntity().body(e.to_string()),
     }
 }
 
-#[get("/logout")]
 pub async fn logout(id: Identity) -> impl Responder {
     id.forget();
     HttpResponse::Found()
@@ -145,11 +159,12 @@ pub async fn logout(id: Identity) -> impl Responder {
         .finish()
 }
 
-#[get("login")]
-pub async fn login_pg() -> std::io::Result<fs::NamedFile> {
-    Ok(fs::NamedFile::open("./static/login.html")?)
+pub async fn login_pg(Query(q): Query<LoginQuery>) -> HttpResponse {
+    let page = LoginTemplate {
+        redirect_path: q.redirect.unwrap_or(String::from("/")),
+    };
+    HttpResponse::Ok().body(page.render_once().unwrap())
 }
-#[get("signup")]
 pub async fn signup_pg() -> std::io::Result<fs::NamedFile> {
     Ok(fs::NamedFile::open("./static/signup.html")?)
 }

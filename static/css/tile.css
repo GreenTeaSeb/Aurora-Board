@@ -1,0 +1,52 @@
+.tile {
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #101010;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 0 20px;
+}
+.tile .header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 2rem;
+  background-color: #303030;
+  box-shadow: 0 0 20px 5px;
+  z-index: 2;
+}
+.tile .header .info {
+  display: flex;
+  gap: 1rem;
+}
+.tile .header .info .pfp {
+  height: 3rem;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 360px;
+  box-shadow: 0 0 20px black;
+}
+.tile .header .info p {
+  height: 3rem;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  font-family: "Catamaran", sans-serif;
+  color: #eeeeee;
+  font-size: larger;
+}
+.tile .header pre {
+  font-family: "Merriweather Sans", sans-serif;
+  color: #eeeeeeb3;
+  white-space: pre-wrap;
+  mask-image: linear-gradient(black, transparent);
+  -webkit-mask-image: linear-gradient(black, transparent);
+  max-height: 5rem;
+  margin: 0;
+}
+.tile img {
+  object-fit: cover;
+  max-height: 30rem;
+}
+
+/*# sourceMappingURL=tile.css.map */

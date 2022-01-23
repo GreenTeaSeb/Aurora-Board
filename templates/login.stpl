@@ -18,7 +18,7 @@
     <div id="display" class="">
       <div id="content" class="">
         <div id="title">Aurora Board</div>
-        <form id="login" action="login" method="post">
+        <form id="login" action= <%=format!("/user/login?redirect={}",redirect_path) %> method="post">
           <div id="inputs">
             <label>
               <svg
