@@ -5,34 +5,34 @@
   background-color: #101010;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 0 20px;
+  box-shadow: 0 0 20px black;
   .header {
     display: flex;
     flex-direction: column;
     gap: 1rem;
     padding: $padding;
     background-color: #303030;
-    box-shadow: 0 0 20px 5px;
+    box-shadow: 0 0 20px 5px black;
     z-index: 2;
-    .info{
-	display: flex;
-	gap: 1rem;
-	.pfp {
-	    height: 3rem;
-	    aspect-ratio: 1;
-	    object-fit: cover;
-	    border-radius: 360px;
-	    box-shadow: 0 0 20px black;
-	}
-	p {
-	    height: 3rem;
-	    margin: 0;
-	    display: flex;
-	    align-items: center;
-	    font-family: "Catamaran", sans-serif;
-	    color: $text;
-	    font-size: larger;
-	}
+    .info {
+      display: flex;
+      gap: 1rem;
+      .pfp {
+        height: 3rem;
+        aspect-ratio: 1;
+        object-fit: cover;
+        border-radius: 360px;
+        box-shadow: 0 0 20px black;
+      }
+      p {
+        height: 3rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        font-family: "Catamaran", sans-serif;
+        color: $text;
+        font-size: larger;
+      }
     }
     pre {
       font-family: "Merriweather Sans", sans-serif;
@@ -43,7 +43,6 @@
       max-height: 5rem;
       margin: 0;
     }
-    
   }
   img {
     object-fit: cover;

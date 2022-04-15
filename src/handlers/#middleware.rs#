@@ -50,9 +50,10 @@ where
         };
 
         Either::Right(ok(req.into_response(
+	   
             HttpResponse::Found()
-                .append_header(("location", format!("/login?redirect={}", path)))
-                .body("Not logged in"),
+                .append_header(("location", format!("/user/login?redirect={}", path)))
+                .finish(),
         )))
     }
 }

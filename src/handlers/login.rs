@@ -42,7 +42,8 @@ struct LoginTemplate {
     redirect_path: String,
 }
 
-async fn new_user(form: SignupData, pool: &MySqlPool) -> Result<User> {
+// LOGIC FUNCTIONS
+async fn new_user(form: SignupData, pool: &MySqlPool) -> Result<u32> {
     let users = sqlx::query_as!(
         User,
         "
@@ -79,17 +80,27 @@ WHERE email = ?
         .await?;
 
         let user = get_by_id(&new.last_insert_id(), pool).await?;
-        Ok(user)
+        Ok(user.id)
     } else {
         return Err(anyhow!("email already in use"));
     }
 }
+// FRONTEND
+pub async fn login_pg(Query(q): Query<LoginQuery>) -> HttpResponse {
+    let page = LoginTemplate {
+        redirect_path: q.redirect.unwrap_or(String::from("/")),
+    };
+    HttpResponse::Ok().body(page.render_once().unwrap())
+}
+pub async fn signup_pg() -> std::io::Result<fs::NamedFile> {
+    Ok(fs::NamedFile::open("./static/signup.html")?)
+}
 
-async fn login_user(form: LoginData, pool: &MySqlPool) -> Result<User> {
-    let user = match sqlx::query_as!(
-        User,
+// API
+async fn login_user(form: LoginData, pool: &MySqlPool) -> Result<u32> {
+    let user = match sqlx::query!(
         r#"
-	SELECT * FROM users
+	SELECT id, password FROM users
 	WHERE email = ? 
     "#,
         form.email
@@ -113,7 +124,7 @@ async fn login_user(form: LoginData, pool: &MySqlPool) -> Result<User> {
         Err(e) => return Err(anyhow!("Error with hash {}", e)),
     };
     if pass {
-        Ok(user)
+        Ok(user.id)
     } else {
         return Err(anyhow!("Wrong password"));
     }
@@ -125,13 +136,13 @@ pub async fn signup(
     db_pool: web::Data<MySqlPool>,
 ) -> impl Responder {
     match new_user(form.into_inner(), db_pool.as_ref()).await {
-        Ok(t) => {
-            id.remember(t.id.to_string());
+        Ok(newid) => {
+            id.remember(newid.to_string());
             HttpResponse::Found()
                 .append_header(("location", "/"))
-                .finish()
+                .json(newid)
         }
-        Err(e) => HttpResponse::UnprocessableEntity().body(e.to_string()),
+        Err(e) => HttpResponse::Unauthorized().body(e.to_string()),
     }
 }
 
@@ -142,13 +153,13 @@ pub async fn login(
     Query(q): Query<LoginQuery>,
 ) -> impl Responder {
     match login_user(form.into_inner(), db_pool.as_ref()).await {
-        Ok(t) => {
-            id.remember(t.id.to_string());
+        Ok(newid) => {
+            id.remember(newid.to_string());
             HttpResponse::Found()
                 .append_header(("location", q.redirect.unwrap_or(String::from("/"))))
-                .finish()
+                .json(newid)
         }
-        Err(e) => HttpResponse::UnprocessableEntity().body(e.to_string()),
+        Err(e) => HttpResponse::Unauthorized().body(e.to_string()),
     }
 }
 
@@ -157,14 +168,4 @@ pub async fn logout(id: Identity) -> impl Responder {
     HttpResponse::Found()
         .append_header(("location", "/"))
         .finish()
-}
-
-pub async fn login_pg(Query(q): Query<LoginQuery>) -> HttpResponse {
-    let page = LoginTemplate {
-        redirect_path: q.redirect.unwrap_or(String::from("/")),
-    };
-    HttpResponse::Ok().body(page.render_once().unwrap())
-}
-pub async fn signup_pg() -> std::io::Result<fs::NamedFile> {
-    Ok(fs::NamedFile::open("./static/signup.html")?)
 }

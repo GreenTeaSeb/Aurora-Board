@@ -1,0 +1,22 @@
+FRONTEND: /
+--------------------------------
+| METHOD | ROUTE          | DESCRIPTION |
+|--------+----------------+-------------|
+| GET    | /              | home page   |
+| GET    | /login         | login page  |
+| GET    | /singup        | signup page |
+| GET    | /boards/{name} | board page  |
+| GET    | /users/{id}    | user page   |
+| GET    | /posts/{id}    | post page   |
+
+API: /api
+--------------------------------
+| METHOD | ROUTE                | DESCRIPTION          |
+|--------+----------------------+----------------------|
+| POST   | /login               | login form           |
+| POST   | /logout              | logouts current user |
+| POST   | /users               | new user             |
+| POST   | /boards              | new board            |
+| POST   | /boards/{name}/join  | user joins board     |
+| POST   | /boards/{name}/leave | user leaves board    |
+| POST   | /posts               | new post             |

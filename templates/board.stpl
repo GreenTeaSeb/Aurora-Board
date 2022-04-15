@@ -1,38 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-  <% include!("./header.stpl"); %>
-	<!-- custom -->
-    <title><%= board.name%></title>
-    <link rel="stylesheet" href="/css/home.css" />
-     </head>
-  <body>
-    <div class="modal">aaa</div>
-    <div id="display" class="">
-     <% include!("./navbar.stpl"); %>
-	<div id="content" class="">
-	    <div id="posts">
-	      <% for _ in 0..10 { include!("./post_tile.stpl");  }%>
-           </div>
-	   <div id="sidebar">
-	     <div id="top">
-	       <%= board.name %>
-	     </div>	
-	     <div id="options">
-	       <% if !is_in { %>
-	       <form action =  <%= format!("{}/join", board.name) %> method = "post"  >
-		 <input type="submit" value="join" class ="button"/>
-	       </form>
-	       <%} else { %>
-	       <form action =  <%= format!("{}/leave", board.name) %> method = "post"  >
-		 <input type="submit" value="leave" class ="button"/>
-	       </form>
-	       <% } %>
-	       <a href="/new/board" class ="button">New board</a>
-	       <a class ="button">New post</a>
-	     </div>
-	    </div>
-	</div>
-    </div> 
-  </body>
+   <head>
+      <% include!("./header.stpl"); %>
+      <!-- custom -->
+      <title>
+         <%= board.name%>
+      </title>
+      <link rel="stylesheet" href="/css/home.css" />
+      <script type="module" src="/newpost.js"></script>
+   </head>
+   <body>
+      <div class="modal">aaa</div>
+      <div id="display" class="">
+         <% include!("./navbar.stpl"); %>
+         <main id="content" class="">
+            <aside id="sidebar-left">
+            </aside>
+            <div id="posts">
+               <div id="editor" class="tile"></div>
+               <% for _ in 0..10 { include!("./post_tile.stpl"); }%>
+            </div>
+            <aside id="sidebar">
+               <div id="top">
+                  <%= board.name %>
+               </div>
+               <div id="options">
+                  <% if !is_in { %>
+                  <form action=<%=format!("{}/join", board.name) %> method = "post" >
+                     <input type="submit" value="join" class="button" />
+                  </form>
+                  <%} else { %>
+                  <form action=<%=format!("{}/leave", board.name) %> method = "post" >
+                     <input type="submit" value="leave" class="button" />
+                  </form>
+                  <% } %>
+                  <a href="/new/board" class="button">New board</a>
+                  <a class="button">New post</a>
+               </div>
+            </aside>
+         </main>
+      </div>
+   </body>
 </html>
+

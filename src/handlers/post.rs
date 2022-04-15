@@ -1,5 +1,5 @@
 use crate::handlers::user::{get_by_id, User};
-use actix_web::{self, get, web, HttpMessage, HttpRequest, HttpResponse};
+use actix_web::{self, web, HttpMessage, HttpRequest, HttpResponse};
 use sailfish::TemplateOnce;
 use sqlx::MySqlPool;
 

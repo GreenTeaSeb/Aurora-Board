@@ -1,4 +1,4 @@
-<div id="topnav">
+<nav id="topnav">
     <div id="title">
     	 <a href="/">Auroroard</a>
     </div>
@@ -22,11 +22,11 @@
 	<p id="username"> <%= u.username %></p>
 	<img alt ="" src= <%= u.pfp %> id="pfp"/>
 	</a>
-	<a href="/user/logout">LOGOUT</a>
+	<a href="/logout">LOGOUT</a>
       
       <%}, Err(_) => { %>
-      <a href="/user/login">login</a>
-      <a href="/user/signup">sign up</a>
+      <a href="/login">login</a>
+      <a href="/signup">sign up</a>
       <%}}%>
     </div>
-      </div>
+      </nav>
