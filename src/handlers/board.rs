@@ -16,6 +16,7 @@ pub struct Board {
     name: String,
     description: String,
     created_at: chrono::DateTime<chrono::Utc>,
+    icon: String
 }
 
 #[derive(Deserialize)]
@@ -143,23 +144,34 @@ pub async fn board_pg(
 pub async fn join_board(pool: web::Data<MySqlPool>, req: HttpRequest) -> impl Responder {
     let id = req.extensions().get::<u64>().unwrap().to_owned();
     let board = req.match_info().get("name").ok_or("").unwrap_or_default();
-    if get_by_name(board, pool.get_ref()).await.is_ok() && user_join(&id, board, pool.get_ref()).await.is_ok() {
-            return HttpResponse::Found()
-                .append_header(("location", format!("/boards/{}", board)))
-                .finish();
+    if !get_by_name(board, pool.get_ref()).await.is_ok() {
+        return HttpResponse::NotFound().body("Board doesn't exist");
     }
-
-    HttpResponse::NotFound().body("Board doesn't exist")
+    if check_if_joined_board(id, board, pool.get_ref())
+        .await
+        .unwrap_or_default()
+    {
+        return HttpResponse::Found()
+            .append_header(("location", format!("/boards/{}", board)))
+            .body("User is already in server");
+    }
+    if !user_join(&id, board, pool.get_ref()).await.is_ok() {
+        return HttpResponse::InternalServerError().body("Failed to join");
+    }
+    return HttpResponse::Found()
+        .append_header(("location", format!("/boards/{}", board)))
+        .finish();
 }
 
 pub async fn leave_board(pool: web::Data<MySqlPool>, req: HttpRequest) -> impl Responder {
     let id = req.extensions().get::<u64>().unwrap().to_owned();
     let board = req.match_info().get("name").ok_or("").unwrap_or_default();
-    if get_by_name(board, pool.get_ref()).await.is_ok() && user_leave(&id, board, pool.get_ref()).await.is_ok() {
-            return HttpResponse::Found()
-                .append_header(("location", format!("/boards/{}", board)))
-                .finish();
-        
+    if get_by_name(board, pool.get_ref()).await.is_ok()
+        && user_leave(&id, board, pool.get_ref()).await.is_ok()
+    {
+        return HttpResponse::Found()
+            .append_header(("location", format!("/boards/{}", board)))
+            .finish();
     }
     HttpResponse::NotFound().body("Board doesn't exist")
 }

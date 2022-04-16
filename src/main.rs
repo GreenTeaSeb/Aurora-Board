@@ -31,6 +31,7 @@ async fn main() -> Result<()> {
                 CookieIdentityPolicy::new(&[0; 32]).name("id").secure(false),
             ))
             .route("/", web::get().to(handlers::home::home))
+            .route("/", web::post().to(handlers::home::home))
             .route("/login", web::get().to(handlers::login::login_pg))
             .route("/signup", web::get().to(handlers::login::signup_pg))
             .route("/logout", web::get().to(handlers::login::logout))

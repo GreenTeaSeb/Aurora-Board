@@ -40,6 +40,7 @@ pub struct LoginQuery {
 #[template(path = "login.stpl", escape = false)]
 struct LoginTemplate {
     redirect_path: String,
+    error: String,
 }
 
 // LOGIC FUNCTIONS
@@ -88,7 +89,8 @@ WHERE email = ?
 // FRONTEND
 pub async fn login_pg(Query(q): Query<LoginQuery>) -> HttpResponse {
     let page = LoginTemplate {
-        redirect_path: q.redirect.unwrap_or(String::from("/")),
+        redirect_path: q.redirect.unwrap_or_else(|| String::from("/")),
+        error: String::default(),
     };
     HttpResponse::Ok().body(page.render_once().unwrap())
 }
@@ -155,8 +157,8 @@ pub async fn login(
     match login_user(form.into_inner(), db_pool.as_ref()).await {
         Ok(newid) => {
             id.remember(newid.to_string());
-            HttpResponse::Found()
-                .append_header(("location", q.redirect.unwrap_or(String::from("/"))))
+            HttpResponse::TemporaryRedirect()
+                .append_header(("location", q.redirect.unwrap_or_else(|| String::from("/"))))
                 .json(newid)
         }
         Err(e) => HttpResponse::Unauthorized().body(e.to_string()),

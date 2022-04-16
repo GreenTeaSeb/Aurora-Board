@@ -11,35 +11,34 @@
    </head>
    <body>
       <div class="modal">aaa</div>
-      <div id="display" class="">
          <% include!("./navbar.stpl"); %>
          <main id="content" class="">
-            <aside id="sidebar-left">
+            <aside id="sidebar-left" class="sidebar">
             </aside>
             <div id="posts">
-               <div id="editor" class="tile"></div>
+               <!-- <div id="editor" class="tile"></div> -->
                <% for _ in 0..10 { include!("./post_tile.stpl"); }%>
             </div>
-            <aside id="sidebar">
-               <div id="top">
-                  <%= board.name %>
+            <aside id="sidebar-right" class="sidebar">
+	    <div id="board-info"> 	
+               <div id="info"> 
+		   <img src= <%= board.icon %> alt="icon" id="icon">
+
                </div>
                <div id="options">
                   <% if !is_in { %>
-                  <form action=<%=format!("{}/join", board.name) %> method = "post" >
-                     <input type="submit" value="join" class="button" />
-                  </form>
-                  <%} else { %>
-                  <form action=<%=format!("{}/leave", board.name) %> method = "post" >
-                     <input type="submit" value="leave" class="button" />
-                  </form>
+		      <form action=<%=format!("{}/join", board.name) %> method = "post" >
+			 <input type="submit" value="join" class="button" />
+		      </form>
+		      <%} else { %>
+		      <form action=<%=format!("{}/leave", board.name) %> method = "post" >
+			 <input type="submit" value="leave" class="button" />
+		      </form>
                   <% } %>
-                  <a href="/new/board" class="button">New board</a>
-                  <a class="button">New post</a>
                </div>
+     </div>		
             </aside>
          </main>
-      </div>
    </body>
 </html>
 

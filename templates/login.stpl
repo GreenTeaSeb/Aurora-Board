@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Login Aurora Board</title>
     <link rel="stylesheet" href="/css/login.css" />
-    <script src="login.js" type="module" defer></script>
     <!-- text font -->
     <link
       href="https://fonts.googleapis.com/css2?family=Catamaran:wght@700;900&family=Merriweather+Sans:wght@300;400&display=swap"
       rel="stylesheet"
     />
 
-    <script src="login.js" type="module" defer></script>
+    <!-- <script src="login.js" type="module" defer></script> -->
      </head>
   <body>
     <div id="display" class="">

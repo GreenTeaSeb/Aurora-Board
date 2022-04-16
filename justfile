@@ -1,17 +1,8 @@
-default: build
 
-run: build
-  RUST_LOG=info cargo run
+watch-sass:
+    node-sass --watch scss -o static/css 
 
-build: build-frontend build-backend
-build-frontend: _format-frontend
-build-backend: _format-backend
-  cargo build
-  
-_format-backend: 
-  cargo fmt
-
-_format-frontend:
-  
+watch-source:
+    cargo watch -x "run"
 clean:
   cargo clean

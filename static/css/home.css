@@ -54,8 +54,9 @@
   height: 3em;
   padding: 0.5rem;
   gap: 2rem;
+  margin-bottom: 2rem;
   z-index: 9;
-  top: -4em;
+  top: 0;
   transition: 0.1s; }
   #topnav #title {
     flex: 1;
@@ -73,9 +74,6 @@
     color: #eeeeeeb3;
     transition: 0.1s;
     z-index: 9; }
-    @media only screen and (max-width: 630px) {
-      #topnav #search {
-        display: none; } }
     #topnav #search:focus-within {
       color: #eeeeee; }
     #topnav #search input {
@@ -129,6 +127,9 @@
       object-fit: cover;
       border-radius: 360px;
       box-shadow: 0 0 20px black; }
+    @media only screen and (max-width: 630px) {
+      #topnav #login {
+        display: none; } }
   #topnav #dropdown-button {
     position: absolute;
     bottom: -3em;
@@ -144,104 +145,97 @@
   #topnav * {
     font-family: "Fira Sans Condensed", sans-serif;
     font-size: inherit; }
-  #topnav:hover {
-    top: 0; }
-  #topnav::after {
-    content: "";
-    position: absolute;
-    height: 8em;
-    width: 100%;
-    z-index: 8; }
-  #topnav.visible {
-    top: 0; }
-    #topnav.visible #dropdown-button g {
-      transform: scaleY(-1);
-      transform-origin: center; }
 
 body {
   background: #202020;
   background-attachment: fixed;
   margin: 0; }
 
-#display {
+body {
   height: inherit;
   display: flex;
   justify-content: center;
   flex-direction: column;
   align-items: center; }
-  #display #content {
-    display: flex;
-    margin: 2rem; }
-    #display #content #posts {
+  body main {
+    display: flex; }
+    body main #posts {
       flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 2rem;
-      color: #ff00ff; }
-    #display #content #editor {
+      color: #ff00ff;
+      max-width: 150rem; }
+    body main #editor {
       width: 100%;
       color: #eeeeee;
       font-family: "Merriweather Sans", sans-serif;
       outline: none; }
-      #display #content #editor .pell-content {
+      body main #editor .pell-content {
         padding: 0 2rem;
         min-height: 10rem;
         outline: none; }
-      #display #content #editor .pell-actionbar {
+      body main #editor .pell-actionbar {
         display: flex;
         background: #202020;
         margin-bottom: 1rem;
         height: 3rem; }
-        #display #content #editor .pell-actionbar .pell-button {
+        body main #editor .pell-actionbar .pell-button {
           flex: 1 1 0px;
           background: none;
           border: none;
           color: #eeeeee; }
-          #display #content #editor .pell-actionbar .pell-button:hover {
+          body main #editor .pell-actionbar .pell-button:hover {
             transform: scale(1.1); }
-    #display #content #sidebar {
+    body main .sidebar {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      height: min-content;
-      z-index: 12;
-      background: #313131;
-      box-shadow: 0 0 20px black;
-      border-radius: 12px; }
-      #display #content #sidebar #top {
-        font-family: "Catamaran", sans-serif;
+      align-items: center; }
+    body main #sidebar-right #top {
+      font-family: "Catamaran", sans-serif;
+      color: #eeeeee; }
+      body main #sidebar-right #top a {
+        text-decoration: none; }
+      body main #sidebar-right #top ol {
+        padding: 0; }
+      body main #sidebar-right #top li {
         color: #eeeeee; }
-        #display #content #sidebar #top a {
-          text-decoration: none; }
-        #display #content #sidebar #top ol {
-          padding: 0; }
-        #display #content #sidebar #top li {
-          color: #eeeeee; }
-          #display #content #sidebar #top li .entry {
-            display: flex;
-            align-items: center; }
-            #display #content #sidebar #top li .entry .name {
-              color: #eeeeee;
-              flex: 1; }
-            #display #content #sidebar #top li .entry .count {
-              float: left;
-              margin-left: 1rem; }
-      #display #content #sidebar #options input {
-        border: none;
-        background: none;
-        width: 100%; }
+        body main #sidebar-right #top li .entry {
+          display: flex;
+          align-items: center; }
+          body main #sidebar-right #top li .entry .name {
+            color: #eeeeee;
+            flex: 1; }
+          body main #sidebar-right #top li .entry .count {
+            float: left;
+            margin-left: 1rem; }
+    body main #sidebar-right #board-info {
+      display: flex;
+      flex-direction: column; }
+      body main #sidebar-right #board-info #info {
+        display: flex;
+        justify-content: center; }
+        body main #sidebar-right #board-info #info #icon {
+          height: 5rem;
+          aspect-ratio: 1;
+          object-fit: cover;
+          border-radius: 360px; }
+    body main #sidebar-right #options input {
+      border: none;
+      background: none;
+      width: 100%; }
     @media only screen and (min-width: 1024px) {
-      #display #content {
-        gap: 2rem; }
-        #display #content #posts {
-          margin-right: calc($sidebar-width + $margin); }
-        #display #content #sidebar-left {
-          width: 20rem; }
-        #display #content #sidebar {
-          width: 20rem; } }
+      body main .sidebar {
+        max-width: 25rem;
+        width: 100%;
+        height: 100%;
+        margin: 0 2rem; }
+      body main #sidebar-right #board-info {
+        width: 25rem;
+        position: fixed; } }
     @media only screen and (max-width: 630px), only screen and (min-width: 631px) and (max-width: 1023px) {
-      #display #content {
+      body main {
         flex-direction: column-reverse; } }
 
 .button {

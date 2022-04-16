@@ -8,12 +8,11 @@
      </head>
   <body>
     <div class="modal">aaa</div>
-    <div id="display" class="">
      <% include!("./navbar.stpl"); %>
 	<main id="content" class="">
 	    <div id="posts">
            </div>
-	   <aside id="sidebar">
+	   <aside id="sidebar-right" class="sidebar">
 	     <div id="top">
 	       <ol>
 		 <% for board in &top_boards { %>
@@ -30,6 +29,5 @@
 	     </div>
 	    </aside>
 	</main>
-    </div> 
   </body>
 </html>
