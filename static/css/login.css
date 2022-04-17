@@ -1,7 +1,33 @@
+.button {
+  font-family: "Catamaran", Sans-Serif;
+  color: #eeeeeeb3;
+  border-radius: 0.5rem;
+  transition: 0.1s;
+  text-decoration: none;
+  height: inherit;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: medium; }
+  .button:hover {
+    color: #eeeeee;
+    transform: scale(1.1); }
+
+.main-button {
+  background: linear-gradient(45deg, #4670c2, #6cdbc3);
+  color: #eeeeee;
+  padding: 0 0.5rem; }
+  .main-button:hover {
+    box-shadow: 0 0 5px #4670c2; }
+
 body {
   background: #202020;
-  background-attachment: fixed;
-  margin: 0; }
+  margin: 0;
+  height: inherit;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center; }
 
 #display {
   display: flex;
@@ -14,35 +40,42 @@ body {
     display: flex;
     flex-direction: column;
     text-align: center;
-    box-shadow: 0 0 20px black; }
+    box-shadow: 0 0 20px black;
+    padding: 1rem 0;
+    gap: 1rem; }
+    #display #content form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem; }
     #display #content #title {
       color: #eeeeee;
       font-family: "Catamaran", Sans-Serif;
       font-weight: 800;
-      font-size: 2rem;
-      padding: 2rem; }
+      font-size: 2rem; }
     #display #content #info {
       color: #eeeeee;
       font-family: "Merriweather Sans", Sans-Serif;
-      font-size: 0.8rem;
-      padding: 2rem; }
+      font-size: 0.8rem; }
+      #display #content #info a {
+        color: #4670c2; }
     #display #content #submit {
-      font-family: "Merriweather Sans", Sans-Serif;
       border: none;
-      padding: 0.5rem;
-      margin: 2rem;
-      width: 5rem;
-      border-radius: 12px;
-      transition: 0.1s; }
+      padding: 1rem; }
     #display #content #errors {
       font-family: "Merriweather Sans", Sans-Serif;
-      color: #fa4164; }
+      color: #fa4164;
+      margin: 0; }
     #display #content #inputs {
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 0 2rem 0 2rem;
-      gap: 1rem; }
+      gap: 1rem;
+      border-bottom: 1px solid #202020;
+      border-top: 1px solid #202020;
+      padding: 1rem;
+      width: 100%;
+      box-sizing: border-box; }
       #display #content #inputs label {
         height: 2rem;
         display: flex;

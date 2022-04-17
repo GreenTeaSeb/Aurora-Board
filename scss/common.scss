@@ -1,28 +1,36 @@
 $bg: #202020;
 $text: #eeeeee;
 $secondary-text: #eeeeeeb3;
-$primary: #313131;
-$secondary: #202020;
+$surface: #313131;
+$primary: #4670c2;
+$secondary: #6cdbc3;
 
 $margin: 2rem;
-$padding: 2rem;
-$navbar-height: 3em;
-$sidebar-width: 25rem;
+$padding: 1rem;
+$navbar-height: 2.5em;
+$sidebar-width: 20rem;
+$search-width: 50rem;
+$border-radius: 0.5rem;
+$big-font: "Catamaran", Sans-Serif;
+$main-font: "Merriweather Sans", sans-serif;
+$shadow: 0 0 20px 5px black;
 
 @mixin main {
   body {
     background: $bg;
-    background-attachment: fixed;
-    // height: 100vh;
     margin: 0;
-    // overflow: hidden;
+    height: inherit;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
   }
 }
 
-@mixin button {
-  font-family: "Catamaran", Sans-Serif;
+.button {
+  font-family: $big-font;
   color: $secondary-text;
-  border-radius: 12px;
+  border-radius: $border-radius;
   transition: 0.1s;
   text-decoration: none;
   height: inherit;
@@ -33,5 +41,14 @@ $sidebar-width: 25rem;
   &:hover {
     color: $text;
     transform: scale(1.1);
+  }
+}
+
+.main-button {
+  background: linear-gradient(45deg, $primary, $secondary);
+  color: $text;
+  padding: 0 0.5rem;
+  &:hover {
+    box-shadow: 0 0 5px $primary;
   }
 }

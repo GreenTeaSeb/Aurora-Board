@@ -4,12 +4,7 @@
 @import "media_queries";
 @include main;
 body {
-  height: inherit;
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  align-items: center;
-
+ 
   main {
     display: flex;
     #posts {
@@ -19,7 +14,7 @@ body {
       align-items: center;
       gap: 2rem;
       color: #ff00ff;
-      max-width: 150rem;
+      max-width: 110rem;
     }
     #editor {
       width: 100%;
@@ -51,54 +46,89 @@ body {
       display: flex;
       flex-direction: column;
       align-items: center;
-    }
-    #sidebar-left {
-    }
-    #sidebar-right {
       #top {
-        font-family: "Catamaran", sans-serif;
-        color: $text;
+        font-family: $big-font;
         a {
           text-decoration: none;
+          color: $text;
         }
         ol {
-          padding: 0;
+          margin: 0;
+          padding: 0 $padding;
         }
         li {
           color: $text;
           .entry {
-            display: flex;
+            display: inline-flex;
+            vertical-align: middle;
             align-items: center;
+            gap: $padding;
+            padding: 0.5rem;
+            width: 100%;
+            img {
+              width: 3rem;
+              aspect-ratio: 1;
+              object-fit: cover;
+              border-radius: 360px;
+            }
             .name {
-              color: $text;
               flex: 1;
             }
             .count {
               float: left;
-              margin-left: 1rem;
             }
           }
         }
       }
-      #board-info {
+      .panel {
         display: flex;
         flex-direction: column;
-        #info {
-	    display: flex;
-	    justify-content: center;
-          #icon {
-            height: 5rem;
-            aspect-ratio: 1;
-            object-fit: cover;
-            border-radius: 360px;
+        background: $surface;
+        border-radius: $border-radius;
+        box-shadow: $shadow;
+        color: $secondary-text;
+        .section {
+          padding: $padding;
+          &:not(:first-child) {
+            border-top: 1px solid $bg;
+          }
+          h2 {
+            font-family: $big-font;
+	    text-align: center;
+            margin: 0;
+          }
+          p {
+            margin: 0;
+            font-family: $main-font;
           }
         }
-      }
-      #options {
-        input {
-          border: none;
-          background: none;
-          width: 100%;
+        #info {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          #icon {
+            height: 5rem;
+            width: 5rem;
+            object-fit: cover;
+            border-radius: 360px;
+            border: 0.5rem solid $bg;
+          }
+        }
+
+        #options {
+          a {
+            justify-content: center;
+          }
+          form {
+            display: flex;
+            justify-content: center;
+            input {
+              border: none;
+              width: 100%;
+              background: none;
+            }
+          }
         }
       }
     }
@@ -108,10 +138,8 @@ body {
         max-width: $sidebar-width;
         width: 100%;
         height: 100%;
-	margin: 0 $margin;
-      }
-      #sidebar-right {
-        #board-info {
+        margin: 0 $margin;
+        .panel {
           width: $sidebar-width;
           position: fixed;
         }
@@ -121,9 +149,6 @@ body {
       flex-direction: column-reverse;
     }
   }
-}
-.button {
-  @include button;
 }
 
 .modal {

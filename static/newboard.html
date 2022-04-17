@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Login Aurora Board</title>
     <link rel="stylesheet" href="/css/login.css" />
-    <!-- <script src="login.js" type="module" defer></script> -->
+    <script src="form.js" type="module" defer></script>
     <!-- text font -->
       <link
       href="https://fonts.googleapis.com/css2?family=Catamaran:wght@700;900&family=Merriweather+Sans:wght@300;400&display=swap"
@@ -16,29 +16,29 @@
     <div id="display" class="">
       <div id="content" class="">
         <div id="title">New Board</div>
-        <form id="login" action="/boards" method="post">
-          <div id="inputs">
-            <label>
-               <input
-                type="text"
-                name="name"
-                placeholder="name"
+        <form method="post" id="newboard" action="/boards">
+	  <div id="inputs">
+			    <label>
+			       <input
+		type="text"
+		name="name"
+		placeholder="name"
 		maxlength="32"
-                required
-              />
-            </label>
-            <label>
-            <textarea
-                type="text"
-                name="desc"
-                placeholder="description"
-                required
-              /></textarea>
-            </label>
-          </div>
+		required
+			      />
+			    </label>
+			    <label>
+			    <textarea
+		type="text"
+		name="desc"
+		placeholder="description"
+		required
+			      /></textarea>
+			    </label>
+	  </div>
 
 	  <p id="errors" ></p>
-          <button id="submit" type="submit">Create</button>
+          <button id="submit" type="submit" class="button main-button">Create</button>
 
         </form>
       </div>

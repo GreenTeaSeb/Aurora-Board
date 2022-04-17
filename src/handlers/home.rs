@@ -14,13 +14,14 @@ struct HomeTemplate {
 struct BoardEntry {
     name: String,
     member_count: u64,
+    icon: String,
 }
 
 async fn get_top(pool: &MySqlPool) -> Result<Vec<BoardEntry>, sqlx::Error> {
     sqlx::query_as!(
         BoardEntry,
         r#"
-   SELECT boards.name, cast(count(members.board_id) as UNSIGNED) as member_count  from boards
+   SELECT boards.name, cast(count(members.board_id) as UNSIGNED) as member_count, boards.icon  from boards
 left join members
 on boards.id = members.board_id
 group by boards.id

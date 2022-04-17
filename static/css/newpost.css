@@ -1,13 +1,56 @@
+.button {
+  font-family: "Catamaran", Sans-Serif;
+  color: #eeeeeeb3;
+  border-radius: 0.5rem;
+  transition: 0.1s;
+  text-decoration: none;
+  height: inherit;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: medium; }
+  .button:hover {
+    color: #eeeeee;
+    transform: scale(1.1); }
+
+.main-button {
+  background: linear-gradient(45deg, #4670c2, #6cdbc3);
+  color: #eeeeee;
+  padding: 0 0.5rem; }
+  .main-button:hover {
+    box-shadow: 0 0 5px #4670c2; }
+
+.button {
+  font-family: "Catamaran", Sans-Serif;
+  color: #eeeeeeb3;
+  border-radius: 0.5rem;
+  transition: 0.1s;
+  text-decoration: none;
+  height: inherit;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: medium; }
+  .button:hover {
+    color: #eeeeee;
+    transform: scale(1.1); }
+
+.main-button {
+  background: linear-gradient(45deg, #4670c2, #6cdbc3);
+  color: #eeeeee;
+  padding: 0 0.5rem; }
+  .main-button:hover {
+    box-shadow: 0 0 5px #4670c2; }
+
 #topnav {
   filter: drop-shadow(0 0 0.75rem black);
   background-color: #313131;
   display: flex;
-  align-items: stretch;
   justify-content: center;
   flex-direction: row;
   align-self: stretch;
   position: sticky;
-  height: 3em;
+  height: 2.5em;
   padding: 0.5rem;
   gap: 2rem;
   margin-bottom: 2rem;
@@ -19,21 +62,33 @@
     z-index: 9; }
     #topnav #title a {
       color: #eeeeee;
-      font-family: "Catamaran", sans-serif;
-      font-size: xx-large;
+      font-family: "Catamaran", Sans-Serif;
+      font-size: x-large;
       text-decoration: none; }
   #topnav #search {
     background-color: #202020;
-    border-radius: 360px;
+    border-radius: 0.5rem;
     display: flex;
     flex: 3;
     color: #eeeeeeb3;
     transition: 0.1s;
-    z-index: 9; }
+    z-index: 9;
+    max-width: 50rem;
+    gap: 0.5rem; }
     #topnav #search:focus-within {
       color: #eeeeee; }
+    #topnav #search #search-space {
+      border: none;
+      background: none;
+      color: #eeeeeeb3;
+      font-family: "Catamaran", Sans-Serif;
+      border-right: 1px solid #313131;
+      width: 4.5rem;
+      padding: 0.5rem;
+      text-align: center; }
     #topnav #search input {
       background-color: transparent;
+      font-family: "Catamaran", Sans-Serif;
       color: inherit;
       border: none;
       flex: 1; }
@@ -59,26 +114,12 @@
     z-index: 9;
     gap: 1rem;
     flex: 1; }
-    #topnav #login #username {
+    #topnav #login a #username {
       float: left;
       color: #eeeeee;
       font-family: "Catamaran", Sans-Serif; }
-    #topnav #login a {
-      font-family: "Catamaran", Sans-Serif;
-      color: #eeeeeeb3;
-      border-radius: 12px;
-      transition: 0.1s;
-      text-decoration: none;
-      height: inherit;
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
-      font-size: medium; }
-      #topnav #login a:hover {
-        color: #eeeeee;
-        transform: scale(1.1); }
-    #topnav #login #pfp {
-      height: 90%;
+    #topnav #login a #pfp {
+      height: 100%;
       aspect-ratio: 1;
       object-fit: cover;
       border-radius: 360px;
@@ -88,7 +129,7 @@
         display: none; } }
   #topnav #dropdown-button {
     position: absolute;
-    bottom: -3em;
+    bottom: -2.5em;
     height: inherit;
     color: #202020;
     z-index: 9; }
@@ -98,11 +139,12 @@
       #topnav #dropdown-button .dropdown-bg g {
         transition: 0.1s;
         color: #eeeeeeb3; }
-  #topnav * {
-    font-family: "Fira Sans Condensed", sans-serif;
-    font-size: inherit; }
 
 body {
   background: #202020;
-  background-attachment: fixed;
-  margin: 0; }
+  margin: 0;
+  height: inherit;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center; }

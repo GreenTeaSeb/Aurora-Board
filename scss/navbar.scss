@@ -3,9 +3,9 @@
 
 #topnav {
   filter: drop-shadow(0 0 0.75rem black);
-  background-color: $primary;
+  background-color: $surface;
   display: flex;
-  align-items: stretch;
+  // align-items: stretch;
   justify-content: center;
   flex-direction: row;
   align-self: stretch;
@@ -22,26 +22,38 @@
     z-index: 9;
     a {
       color: $text;
-      font-family: "Catamaran", sans-serif;
-      font-size: xx-large;
+      font-family: $big-font;
+      font-size: x-large;
       text-decoration: none;
     }
   }
   #search {
-   
-
-    background-color: $secondary;
-    border-radius: 360px;
+    background-color: $bg;
+    border-radius: $border-radius;
     display: flex;
     flex: 3;
     color: $secondary-text;
     transition: 0.1s;
     z-index: 9;
+    max-width: $search-width;
+    gap: 0.5rem;
     &:focus-within {
       color: $text;
     }
+    #search-space {
+      border: none;
+      background: none;
+      color: $secondary-text;
+      font-family: $big-font;
+      border-right: 1px solid $surface;
+      width: 4.5rem;
+      padding: 0.5rem;
+      text-align: center;
+    }
+
     input {
       background-color: transparent;
+      font-family: $big-font;
       color: inherit;
       border: none;
       flex: 1;
@@ -73,25 +85,23 @@
     z-index: 9;
     gap: 1rem;
     flex: 1;
-    #username {
-      float: left;
-      color: $text;
-      font-family: "Catamaran", Sans-Serif;
-    }
     a {
-      @include button;
+      #username {
+        float: left;
+        color: $text;
+        font-family: $big-font;
+      }
+      #pfp {
+        height: 100%;
+        aspect-ratio: 1;
+        object-fit: cover;
+        border-radius: 360px;
+        box-shadow: 0 0 20px black;
+      }
     }
-
-    #pfp {
-      height: 90%;
-      aspect-ratio: 1;
-      object-fit: cover;
-      border-radius: 360px;
-      box-shadow: 0 0 20px black;
+    @include for_breakpoint(mobile) {
+      display: none;
     }
-     @include for_breakpoint(mobile) {
-	  display: none;
-	}
   }
   #dropdown-button {
     position: absolute;
@@ -107,9 +117,5 @@
       z-index: 8;
     }
     z-index: 9;
-  }
-  * {
-    font-family: "Fira Sans Condensed", sans-serif;
-    font-size: inherit;
   }
 }

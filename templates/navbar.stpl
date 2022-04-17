@@ -3,30 +3,35 @@
     	 <a href="/">Auroroard</a>
     </div>
     <form  id="search">
+    <select id="search-space">
+      <option value="global">global</option>
+      <option value="board">board</option>
+    </select>  
+	<input type = "search" id="search-submit" name="search" required > 
+	<label for="search-submit">
+	    <button type="submit" aria-label="search-submit ">
+		<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" style="">
+		    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path>
+		</svg>
+	    </button>
+	</label>
 
-    <label for="search-submit">
-      	<button type="submit" aria-label="search-submit ">
-	<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" style="">
-    	 <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path>
-      </svg>
-    </button>
-    </label>
-    <input type = "search" id="search-submit" name="search" required > 
-   
-</form>
-<div id="login">
+    </form>
+    <div id="login">
       <% match user {
 	 Ok(u) => {
       %>
-      <a href= <%=format!("/user/{}", u.id) %>> 
+      <a href= <%=format!("/user/{}", u.id) %> class="button"> 
 	<p id="username"> <%= u.username %></p>
 	<img alt ="" src= <%= u.pfp %> id="pfp"/>
 	</a>
-	<a href="/logout">LOGOUT</a>
       
       <%}, Err(_) => { %>
-      <a href="/login">login</a>
-      <a href="/signup">sign up</a>
+      <a href="/login" class="button">login</a>
+      <a href="/signup" class="button main-button">sign up</a>
       <%}}%>
     </div>
-      </nav>
+</nav>
+
+
+

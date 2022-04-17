@@ -1,0 +1,21 @@
+.button {
+  font-family: "Catamaran", Sans-Serif;
+  color: #eeeeeeb3;
+  border-radius: 0.5rem;
+  transition: 0.1s;
+  text-decoration: none;
+  height: inherit;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: medium; }
+  .button:hover {
+    color: #eeeeee;
+    transform: scale(1.1); }
+
+.main-button {
+  background: linear-gradient(45deg, #4670c2, #6cdbc3);
+  color: #eeeeee;
+  padding: 0 0.5rem; }
+  .main-button:hover {
+    box-shadow: 0 0 5px #4670c2; }

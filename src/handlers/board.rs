@@ -1,14 +1,17 @@
+use super::user::check_if_joined_board;
 use crate::handlers::user::{self, User};
 use actix_files as fs;
 use actix_identity::Identity;
+use actix_multipart::Multipart;
 use actix_web::{self, web, HttpMessage, HttpRequest, HttpResponse, Responder};
 use anyhow::{anyhow, Result};
+use futures_util::stream::TryStreamExt as _;
+use futures_util::stream::StreamExt as _;
 use sailfish::TemplateOnce;
 use serde::{Deserialize, Serialize};
 use sqlx::{types::chrono, FromRow, MySqlPool};
 
-use super::user::check_if_joined_board;
-
+use std::io::Write;
 #[derive(Serialize, FromRow, Debug)]
 pub struct Board {
     id: u32,
@@ -16,7 +19,7 @@ pub struct Board {
     name: String,
     description: String,
     created_at: chrono::DateTime<chrono::Utc>,
-    icon: String
+    icon: String,
 }
 
 #[derive(Deserialize)]
@@ -189,3 +192,5 @@ pub async fn newboard(
         Err(e) => HttpResponse::UnprocessableEntity().body(e.to_string()),
     }
 }
+
+

@@ -14,25 +14,27 @@
          <% include!("./navbar.stpl"); %>
          <main id="content" class="">
             <aside id="sidebar-left" class="sidebar">
+            <% include!("./leftside.stpl"); %>
             </aside>
             <div id="posts">
                <!-- <div id="editor" class="tile"></div> -->
                <% for _ in 0..10 { include!("./post_tile.stpl"); }%>
             </div>
             <aside id="sidebar-right" class="sidebar">
-	    <div id="board-info"> 	
-               <div id="info"> 
+	    <div id="board-info" class="panel"> 	
+               <div id="info" class="section"> 
 		   <img src= <%= board.icon %> alt="icon" id="icon">
-
+		    <h2> <%= board.name %> </h2>
+		    <p> <%= board.description %> </p>
                </div>
-               <div id="options">
+               <div id="options" class="section">
                   <% if !is_in { %>
 		      <form action=<%=format!("{}/join", board.name) %> method = "post" >
-			 <input type="submit" value="join" class="button" />
+			 <input type="submit" value="join" class="button" id="join" />
 		      </form>
 		      <%} else { %>
 		      <form action=<%=format!("{}/leave", board.name) %> method = "post" >
-			 <input type="submit" value="leave" class="button" />
+			 <input type="submit" value="leave" class="button" id="leave" />
 		      </form>
                   <% } %>
                </div>

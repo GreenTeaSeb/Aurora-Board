@@ -10,23 +10,37 @@
     <div class="modal">aaa</div>
      <% include!("./navbar.stpl"); %>
 	<main id="content" class="">
+  <aside id="sidebar-left" class="sidebar">
+  <% include!("./leftside.stpl"); %>
+            </aside>
+
 	    <div id="posts">
+<% for _ in 0..10 { include!("./post_tile.stpl"); }%>
+
            </div>
 	   <aside id="sidebar-right" class="sidebar">
-	     <div id="top">
+
+	    <div class="panel"> 	
+	    <div class="section">
+		<h2>Top boards</h2>		
+	    </div>
+	     <div id="top" class="section">
 	       <ol>
 		 <% for board in &top_boards { %>
 		 <li>
-		   <div class = "entry">
-		     <a class="name" href= <%= format!("\"/boards/{}\"",board.name) %> > <%= board.name %> </a>
-		     <p class="count"> <%= board.member_count %> <p> </div>
+		   <a  href= <%= format!("\"/boards/{}\"",board.name) %>class = "entry">
+		       <img src= <%= board.icon %> alt="">
+		     <p class="name" > <%= board.name %> </p>
+		     <p class="count"> <%= board.member_count %> </p>
+		   </a>
 		 </li>
 		 <% } %>
 	       </ol>
 	     </div>	
-	     <div id="options">
-	       <a href="/new/board" class ="button">New board</a>
+	     <div id="options" class="section">
+	       <a href="/boards" class ="button">New board</a>
 	     </div>
+	    </div>
 	    </aside>
 	</main>
   </body>

@@ -1,6 +1,6 @@
 @import "common";
 .tile {
-  border-radius: 12px;
+  border-radius: $border-radius;
   overflow: hidden;
   background-color: #101010;
   display: flex;
@@ -12,7 +12,7 @@
     gap: 1rem;
     padding: $padding;
     background-color: #303030;
-    box-shadow: 0 0 20px 5px black;
+    box-shadow: $shadow; 
     z-index: 2;
     .info {
       display: flex;
@@ -29,13 +29,13 @@
         margin: 0;
         display: flex;
         align-items: center;
-        font-family: "Catamaran", sans-serif;
+        font-family: $big-font; 
         color: $text;
         font-size: larger;
       }
     }
     pre {
-      font-family: "Merriweather Sans", sans-serif;
+      font-family: $main-font;
       color: $secondary-text;
       white-space: pre-wrap;
       mask-image: linear-gradient(black, transparent);
