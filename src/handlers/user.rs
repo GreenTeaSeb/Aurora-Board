@@ -23,7 +23,7 @@ struct UserTemplate {
     user_guest: User,
 }
 
-pub async fn get_by_id(id: &u64, pool: &MySqlPool) -> Result<User> {
+pub async fn get_by_id(id: &u32, pool: &MySqlPool) -> Result<User> {
     Ok(sqlx::query_as!(
         User,
         r#"
@@ -38,9 +38,9 @@ pub async fn get_by_id(id: &u64, pool: &MySqlPool) -> Result<User> {
 
 pub async fn get(id: Identity, req: HttpRequest, pool: web::Data<MySqlPool>) -> HttpResponse {
     let id_guest = req.match_info().get("id").ok_or("no such id");
-    let id_guest_int: u64 = id_guest.unwrap_or_default().parse().unwrap_or_default();
+    let id_guest_int: u32 = id_guest.unwrap_or_default().parse().unwrap_or_default();
     let user_guest_data = get_by_id(&id_guest_int, pool.get_ref()).await;
-    let id_int: u64 = id
+    let id_int: u32 = id
         .identity()
         .unwrap_or_default()
         .parse()
@@ -60,7 +60,7 @@ pub async fn get(id: Identity, req: HttpRequest, pool: web::Data<MySqlPool>) -> 
     }
 }
 
-pub async fn check_if_joined_board(id: u64, board: &str, pool: &MySqlPool) -> Result<bool> {
+pub async fn check_if_joined_board(id: u32, board: &str, pool: &MySqlPool) -> Result<bool> {
     Ok(sqlx::query!(
         r#"
 SELECT count(*) AS is_in FROM members
@@ -73,4 +73,23 @@ WHERE board_id = (SELECT id FROM boards WHERE name = ?) AND user_id = ?
     .await?
     .is_in
         != 0)
+}
+
+pub struct UserBoards {
+    pub name: String,
+    pub icon: String,
+}
+pub async fn get_user_boards(id: u32, pool: &MySqlPool) -> Vec<UserBoards> {
+    sqlx::query_as!(
+        UserBoards,
+        r#"
+select  boards.name, boards.icon from boards
+inner join members on
+members.board_id = boards.id and user_id = ?
+"#,
+        id
+    )
+    .fetch_all(pool)
+    .await
+    .unwrap_or_default()
 }

@@ -4,9 +4,13 @@
 @import "media_queries";
 @include main;
 body {
- 
   main {
     display: flex;
+    justify-content: center;
+    height: calc(100vh - #{$navbar-height});
+    overflow-y: scroll;
+    padding-top: $margin;
+    filter: drop-shadow(0 0 5px #111);
     #posts {
       flex: 1;
       display: flex;
@@ -14,12 +18,12 @@ body {
       align-items: center;
       gap: 2rem;
       color: #ff00ff;
-      max-width: 110rem;
+      max-width: 60rem;
     }
     #editor {
       width: 100%;
       color: $text;
-      font-family: "Merriweather Sans", sans-serif;
+      font-family: $main-font;
       outline: none;
       .pell-content {
         padding: 0 $padding;
@@ -46,60 +50,79 @@ body {
       display: flex;
       flex-direction: column;
       align-items: center;
+      width: 100%;
+      height: 100%;
       #top {
         font-family: $big-font;
-        a {
-          text-decoration: none;
-          color: $text;
-        }
-        ol {
-          margin: 0;
-          padding: 0 $padding;
-        }
-        li {
-          color: $text;
-          .entry {
-            display: inline-flex;
-            vertical-align: middle;
-            align-items: center;
-            gap: $padding;
-            padding: 0.5rem;
-            width: 100%;
-            img {
-              width: 3rem;
-              aspect-ratio: 1;
-              object-fit: cover;
-              border-radius: 360px;
-            }
-            .name {
-              flex: 1;
-            }
-            .count {
-              float: left;
-            }
-          }
+        overflow-y: auto;
+      }
+      #user-boards {
+        overflow-y: auto;
+        ul {
+          list-style-type: none;
         }
       }
       .panel {
         display: flex;
         flex-direction: column;
-        background: $surface;
-        border-radius: $border-radius;
-        box-shadow: $shadow;
         color: $secondary-text;
+        width: 100%;
+        max-height: inherit;
         .section {
+          background: $surface;
           padding: $padding;
+	  &:first-child{
+	    border-radius: $border-radius $border-radius 2px 2px;
+	  }
           &:not(:first-child) {
-            border-top: 1px solid $bg;
+            // border-top: 2px solid $bg;
+	    border-radius: 2px  ;
+	    margin-top: 1px;
           }
-          h2 {
+	  &:last-child{
+	    border-radius: 2px 2px $border-radius $border-radius ;
+	  }
+          .title {
             font-family: $big-font;
-	    text-align: center;
+            text-align: center;
+            color: linear-gradient(45deg, $primary, $secondary);
             margin: 0;
           }
           p {
             margin: 0;
             font-family: $main-font;
+          }
+          a {
+            text-decoration: none;
+            color: $text;
+          }
+          ol,
+          ul {
+            margin: 0;
+            padding: 0 $padding;
+          }
+          li {
+            color: $text;
+            .entry {
+              display: inline-flex;
+              vertical-align: middle;
+              align-items: center;
+              gap: $padding;
+              padding: 0.5rem;
+              width: 100%;
+              img {
+                width: 3rem;
+                aspect-ratio: 1;
+                object-fit: cover;
+                border-radius: 360px;
+              }
+              .name {
+                flex: 1;
+              }
+              .count {
+                float: left;
+              }
+            }
           }
         }
         #info {
@@ -133,16 +156,12 @@ body {
       }
     }
     @include for_breakpoint(desktop) {
-      // align-items: stretch;
       .sidebar {
         max-width: $sidebar-width;
-        width: 100%;
-        height: 100%;
+        max-height: calc(100% - 1rem);
         margin: 0 $margin;
-        .panel {
-          width: $sidebar-width;
-          position: fixed;
-        }
+        position: sticky;
+        top: 0;
       }
     }
     @include for_breakpoint(mobile tablet) {
@@ -152,24 +171,13 @@ body {
 }
 
 .modal {
-  background-color: rgba(0, 0, 0, 0.65);
-  position: absolute;
-  justify-content: center;
-  align-items: center;
-  display: none;
-  top: 0;
-  left: 0;
-  border-radius: 10px;
-  width: 100vw;
-  height: 100vh;
-  &.active {
-    z-index: 10;
-    display: flex;
-  }
-  &.active ~ div {
+  &[open] ~ * {
     overflow: hidden;
-    filter: blur(10px);
+    filter: blur(10px) !important;
     transition: 0.5s;
+  }
+  &::backdrop{
+     background: rgba(0,0,0,0.5);
   }
 }
 .spinner {

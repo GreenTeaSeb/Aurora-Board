@@ -7,24 +7,27 @@ $secondary: #6cdbc3;
 
 $margin: 2rem;
 $padding: 1rem;
-$navbar-height: 2.5em;
+$navbar-height: 2.5rem;
 $sidebar-width: 20rem;
 $search-width: 50rem;
 $border-radius: 0.5rem;
 $big-font: "Catamaran", Sans-Serif;
 $main-font: "Merriweather Sans", sans-serif;
-$shadow: 0 0 20px 5px black;
+$shadow: 0 0 10px  black;
 
 @mixin main {
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
   body {
     background: $bg;
-    margin: 0;
-    height: inherit;
     display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-  }
+    flex-direction: column;  
+}
 }
 
 .button {
@@ -38,6 +41,7 @@ $shadow: 0 0 20px 5px black;
   gap: 0.5rem;
   align-items: center;
   font-size: medium;
+  justify-content: center;
   &:hover {
     color: $text;
     transform: scale(1.1);
@@ -51,4 +55,8 @@ $shadow: 0 0 20px 5px black;
   &:hover {
     box-shadow: 0 0 5px $primary;
   }
+}
+
+.unselectable{
+    user-select: none;
 }

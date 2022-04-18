@@ -42,7 +42,7 @@ where
         let path = get_path(&req);
 
         if id.is_some() {
-            let user_id_int: u64 = id.unwrap_or_default().parse().unwrap_or_default();
+            let user_id_int: u32 = id.unwrap_or_default().parse().unwrap_or_default();
             if user_id_int > 0 {
                 req.extensions_mut().insert(user_id_int);
                 return Either::Left(self.service.call(req));

@@ -40,7 +40,6 @@ pub struct LoginQuery {
 #[template(path = "login.stpl", escape = false)]
 struct LoginTemplate {
     redirect_path: String,
-    error: String,
 }
 
 // LOGIC FUNCTIONS
@@ -79,8 +78,8 @@ WHERE email = ?
         )
         .execute(pool)
         .await?;
-
-        let user = get_by_id(&new.last_insert_id(), pool).await?;
+        let last_id: u32 = new.last_insert_id() as u32;
+        let user = get_by_id(&last_id, pool).await?;
         Ok(user.id)
     } else {
         return Err(anyhow!("email already in use"));
@@ -90,7 +89,6 @@ WHERE email = ?
 pub async fn login_pg(Query(q): Query<LoginQuery>) -> HttpResponse {
     let page = LoginTemplate {
         redirect_path: q.redirect.unwrap_or_else(|| String::from("/")),
-        error: String::default(),
     };
     HttpResponse::Ok().body(page.render_once().unwrap())
 }

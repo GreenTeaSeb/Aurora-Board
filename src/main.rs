@@ -45,7 +45,8 @@ async fn main() -> Result<()> {
                         web::scope("{name}")
                             .wrap(handlers::middleware::LoginAuth)
                             .route("join", web::post().to(handlers::board::join_board))
-                            .route("leave", web::post().to(handlers::board::leave_board)),
+                            .route("leave", web::post().to(handlers::board::leave_board))
+                            .route("", web::post().to(handlers::post::newpost)),
                     )
                     .service(
                         web::scope("")

@@ -1,3 +1,4 @@
+use super::user::{get_user_boards, UserBoards};
 use crate::handlers::user::{get_by_id, User};
 use actix_identity::Identity;
 use actix_web::{web, HttpResponse};
@@ -9,6 +10,7 @@ use sqlx::MySqlPool;
 struct HomeTemplate {
     user: anyhow::Result<User>,
     top_boards: Vec<BoardEntry>,
+    user_boards: Vec<UserBoards>,
 }
 
 struct BoardEntry {
@@ -33,7 +35,7 @@ limit 10;"#
 }
 
 pub async fn home(id: Identity, pool: web::Data<MySqlPool>) -> HttpResponse {
-    let id_int: u64 = id
+    let id_int: u32 = id
         .identity()
         .unwrap_or_default()
         .parse()
@@ -43,6 +45,7 @@ pub async fn home(id: Identity, pool: web::Data<MySqlPool>) -> HttpResponse {
     let temp = HomeTemplate {
         user: user_res,
         top_boards: top,
+        user_boards: get_user_boards(id_int, pool.get_ref()).await,
     };
     HttpResponse::Ok().body(temp.render_once().unwrap())
 }

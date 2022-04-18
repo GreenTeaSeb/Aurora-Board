@@ -8,7 +8,8 @@
   display: flex;
   gap: 0.5rem;
   align-items: center;
-  font-size: medium; }
+  font-size: medium;
+  justify-content: center; }
   .button:hover {
     color: #eeeeee;
     transform: scale(1.1); }
@@ -19,3 +20,6 @@
   padding: 0 0.5rem; }
   .main-button:hover {
     box-shadow: 0 0 5px #4670c2; }
+
+.unselectable {
+  user-select: none; }

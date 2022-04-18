@@ -8,7 +8,8 @@
   display: flex;
   gap: 0.5rem;
   align-items: center;
-  font-size: medium; }
+  font-size: medium;
+  justify-content: center; }
   .button:hover {
     color: #eeeeee;
     transform: scale(1.1); }
@@ -20,6 +21,9 @@
   .main-button:hover {
     box-shadow: 0 0 5px #4670c2; }
 
+.unselectable {
+  user-select: none; }
+
 #topnav {
   filter: drop-shadow(0 0 0.75rem black);
   background-color: #313131;
@@ -28,10 +32,9 @@
   flex-direction: row;
   align-self: stretch;
   position: sticky;
-  height: 2.5em;
-  padding: 0.5rem;
+  height: 2.5rem;
+  padding: 0.25rem;
   gap: 2rem;
-  margin-bottom: 2rem;
   z-index: 9;
   top: 0;
   transition: 0.1s; }
@@ -107,7 +110,7 @@
         display: none; } }
   #topnav #dropdown-button {
     position: absolute;
-    bottom: -2.5em;
+    bottom: -2.5rem;
     height: inherit;
     color: #202020;
     z-index: 9; }

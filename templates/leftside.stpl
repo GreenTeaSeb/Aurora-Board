@@ -1,11 +1,24 @@
 <div class="panel">
 	<div class="section">
-		 1	
+	
+	</div>
+
+	<div class="section" id="user-boards">
+	    <details open>
+		<summary class="title unselectable">User boards</summary>
+		<ul>
+		<% for board in &user_boards { %>
+		    <li>
+				<a href=<%=format!("\"/boards/{}\"",board.name)%> class="entry">
+			    	<img src= <%= board.icon %>  alt="">
+			    	<p class="name"> <%= board.name %> </p>
+				</a>
+		   </li>
+		<%};%>
+		</ul>	
+	    </details>	
 	</div>
 	<div class="section">
-	  2	
-	</div>
-	<div class="section">
-	  3	
+	
 	</div>
 </div>

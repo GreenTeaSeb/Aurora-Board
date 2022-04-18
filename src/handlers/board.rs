@@ -1,17 +1,14 @@
-use super::user::check_if_joined_board;
+use super::user::{check_if_joined_board, get_user_boards, UserBoards};
+use super::post::{Post,get_all_posts};
 use crate::handlers::user::{self, User};
 use actix_files as fs;
 use actix_identity::Identity;
-use actix_multipart::Multipart;
 use actix_web::{self, web, HttpMessage, HttpRequest, HttpResponse, Responder};
 use anyhow::{anyhow, Result};
-use futures_util::stream::TryStreamExt as _;
-use futures_util::stream::StreamExt as _;
 use sailfish::TemplateOnce;
 use serde::{Deserialize, Serialize};
 use sqlx::{types::chrono, FromRow, MySqlPool};
 
-use std::io::Write;
 #[derive(Serialize, FromRow, Debug)]
 pub struct Board {
     id: u32,
@@ -34,11 +31,13 @@ struct BoardTemplate {
     board: Board,
     user: anyhow::Result<User>,
     is_in: bool,
+    user_boards: Vec<UserBoards>,
+    posts: Vec<Post>
 }
 
 // LOGIC FUNCTIONS
 
-async fn create_board(id: u64, form: NewBoardData, pool: &MySqlPool) -> Result<String> {
+async fn create_board(id: u32, form: NewBoardData, pool: &MySqlPool) -> Result<String> {
     let boards = sqlx::query_as!(
         Board,
         r#"
@@ -80,7 +79,7 @@ pub async fn get_by_name(name: &str, pool: &MySqlPool) -> Result<Board> {
     .await?)
 }
 
-async fn user_join(id: &u64, board: &str, pool: &MySqlPool) -> Result<()> {
+async fn user_join(id: &u32, board: &str, pool: &MySqlPool) -> Result<()> {
     sqlx::query!(
         r#"
 	INSERT INTO members (user_id, board_id, admin)
@@ -95,7 +94,7 @@ VALUES (?, (select id from boards where name = ? ) , ?)
     Ok(())
 }
 
-async fn user_leave(id: &u64, board: &str, pool: &MySqlPool) -> Result<()> {
+async fn user_leave(id: &u32, board: &str, pool: &MySqlPool) -> Result<()> {
     sqlx::query!(
         r#"
 DELETE FROM members where user_id = ? and  (select id from boards where name = ? ) 
@@ -120,7 +119,7 @@ pub async fn board_pg(
     pool: web::Data<MySqlPool>,
 ) -> impl Responder {
     let board = req.match_info().get("name").ok_or("").unwrap_or_default();
-    let id: u64 = id
+    let id: u32 = id
         .identity()
         .unwrap_or_default()
         .parse()
@@ -135,6 +134,8 @@ pub async fn board_pg(
                 is_in: check_if_joined_board(id, board, pool.get_ref())
                     .await
                     .unwrap_or_default(),
+                user_boards: get_user_boards(id, pool.get_ref()).await,
+                posts: get_all_posts(board.to_string(),pool.get_ref()).await
             };
             HttpResponse::Found().body(temp.render_once().unwrap())
         }
@@ -145,7 +146,7 @@ pub async fn board_pg(
 // API
 
 pub async fn join_board(pool: web::Data<MySqlPool>, req: HttpRequest) -> impl Responder {
-    let id = req.extensions().get::<u64>().unwrap().to_owned();
+    let id = req.extensions().get::<u32>().unwrap().to_owned();
     let board = req.match_info().get("name").ok_or("").unwrap_or_default();
     if !get_by_name(board, pool.get_ref()).await.is_ok() {
         return HttpResponse::NotFound().body("Board doesn't exist");
@@ -167,7 +168,7 @@ pub async fn join_board(pool: web::Data<MySqlPool>, req: HttpRequest) -> impl Re
 }
 
 pub async fn leave_board(pool: web::Data<MySqlPool>, req: HttpRequest) -> impl Responder {
-    let id = req.extensions().get::<u64>().unwrap().to_owned();
+    let id = req.extensions().get::<u32>().unwrap().to_owned();
     let board = req.match_info().get("name").ok_or("").unwrap_or_default();
     if get_by_name(board, pool.get_ref()).await.is_ok()
         && user_leave(&id, board, pool.get_ref()).await.is_ok()
@@ -184,7 +185,7 @@ pub async fn newboard(
     pool: web::Data<MySqlPool>,
     req: HttpRequest,
 ) -> impl Responder {
-    let id = req.extensions().get::<u64>().unwrap().to_owned();
+    let id = req.extensions().get::<u32>().unwrap().to_owned();
     match create_board(id, form.into_inner(), pool.as_ref()).await {
         Ok(id) => HttpResponse::Found()
             .append_header(("location", format!("/boards/{}", id)))
@@ -192,5 +193,3 @@ pub async fn newboard(
         Err(e) => HttpResponse::UnprocessableEntity().body(e.to_string()),
     }
 }
-
-
