@@ -13,21 +13,36 @@ $search-width: 50rem;
 $border-radius: 0.5rem;
 $big-font: "Catamaran", Sans-Serif;
 $main-font: "Merriweather Sans", sans-serif;
-$shadow: 0 0 10px  black;
+$shadow: 0 0 10px black;
 
 @mixin main {
-
-html,
-body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
+  html,
+  body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
   body {
     background: $bg;
     display: flex;
-    flex-direction: column;  
+    flex-direction: column;
+  }
 }
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  border-radius: 10px;  background: $secondary-text;
 }
 
 .button {
@@ -57,6 +72,6 @@ body {
   }
 }
 
-.unselectable{
-    user-select: none;
+.unselectable {
+  user-select: none;
 }

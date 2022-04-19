@@ -1,6 +1,6 @@
 use super::user::check_if_joined_board;
 use actix_web::{self, web, HttpMessage, HttpRequest, HttpResponse, Responder};
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, MySqlPool};
 
@@ -12,12 +12,12 @@ pub struct NewPostdata {
 
 #[derive(Serialize, FromRow, Debug)]
 pub struct Post {
-    id: u32,
-    created_at: chrono::DateTime<chrono::Utc>,
-    poster_id: u32,
-    board_id: u32,
-   pub title: String,
-   pub text: String,
+    pub id: u32,
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    pub poster_id: u32,
+    pub board_id: u32,
+    pub title: String,
+    pub text: String,
 }
 
 //LOGIC
@@ -38,21 +38,6 @@ values(?, (select id from boards where name = ?) ,?,?);
     .await?;
     let last_id: u32 = new.last_insert_id() as u32;
     Ok(last_id)
-}
-
-pub async fn get_all_posts(board_name: String, pool: &MySqlPool) -> Vec<Post> {
-    sqlx::query_as!(
-        Post,
-        r#"
-select * from posts
-where board_id = (select id from boards where name = ?)
-order by created_at desc
-"#,
-        board_name
-    )
-    .fetch_all(pool)
-    .await
-    .unwrap_or_default()
 }
 
 //API

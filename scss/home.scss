@@ -1,8 +1,9 @@
 @import "tile";
 @import "common";
-@import "navbar";
 @import "media_queries";
+@import "navbar";
 @include main;
+
 body {
   main {
     display: flex;
@@ -10,15 +11,20 @@ body {
     height: calc(100vh - #{$navbar-height});
     overflow-y: scroll;
     padding-top: $margin;
-    filter: drop-shadow(0 0 5px #111);
+    filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.5));
     #posts {
-      flex: 1;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 2rem;
-      color: #ff00ff;
-      max-width: 60rem;
+      gap: $margin;
+      width: 60rem;
+      .page {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2rem;
+        border-bottom: 2px dashed $surface;
+        padding-bottom: $margin;
+      }
     }
     #editor {
       width: 100%;
@@ -71,17 +77,17 @@ body {
         .section {
           background: $surface;
           padding: $padding;
-	  &:first-child{
-	    border-radius: $border-radius $border-radius 2px 2px;
-	  }
-          &:not(:first-child) {
-            // border-top: 2px solid $bg;
-	    border-radius: 2px  ;
-	    margin-top: 1px;
+          &:first-child {
+            border-radius: $border-radius $border-radius 2px 2px;
           }
-	  &:last-child{
-	    border-radius: 2px 2px $border-radius $border-radius ;
-	  }
+          &:not(:first-child) {
+            border-top: 2px solid $bg;
+            border-radius: 2px;
+            // margin-top: 1px;
+          }
+          &:last-child {
+            border-radius: 2px 2px $border-radius $border-radius;
+          }
           .title {
             font-family: $big-font;
             text-align: center;
@@ -176,8 +182,8 @@ body {
     filter: blur(10px) !important;
     transition: 0.5s;
   }
-  &::backdrop{
-     background: rgba(0,0,0,0.5);
+  &::backdrop {
+    background: rgba(0, 0, 0, 0.5);
   }
 }
 .spinner {

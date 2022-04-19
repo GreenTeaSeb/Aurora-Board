@@ -1,33 +1,44 @@
 @import "common";
+@import "media_queries";
 .tile {
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 60rem;
   .header {
     display: flex;
     .data {
       border-radius: $border-radius 2px 2px $border-radius;
       background-color: $surface;
-      flex: 1;
-      padding: $padding;
+      min-width: 0;
+      width: 100%;
       .info {
         display: flex;
         gap: 1rem;
         color: $text;
         font-family: $big-font;
-	border-bottom: 1px solid $bg;
+        border-bottom: 2px solid $bg;
+        padding: calc($padding/2) $padding;
+        align-items: center;
+	.title{
+	    flex: 1;
+	    overflow: hidden;
+	    text-overflow: ellipsis;
+	}
+	.time{
+	    color: $secondary-text;
+	}
         .pfp {
           height: 3rem;
           aspect-ratio: 1;
           object-fit: cover;
           border-radius: 360px;
-          box-shadow: 0 0 20px black;
+          // box-shadow: 0 0 20px black;
         }
       }
       .text {
         color: $secondary-text;
         font-family: $main-font;
+        margin: $padding;
         text-overflow: ellipsis;
         overflow: hidden;
         display: -webkit-box !important;
@@ -39,13 +50,18 @@
     .options {
       background-color: $surface;
       border-radius: 2px $border-radius $border-radius 2px;
-      padding: $padding;
-      margin-left: 1px;
+      // margin-left: 1px;
+      border-left: 2px solid $bg;
       float: right;
       display: flex;
       flex-direction: column;
+      justify-content: center;
+
       svg {
+        padding: $padding;
+        flex: 1;
         height: 2rem;
+        color: $secondary-text;
       }
     }
   }

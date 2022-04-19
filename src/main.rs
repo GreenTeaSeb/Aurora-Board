@@ -41,6 +41,7 @@ async fn main() -> Result<()> {
             .service(
                 web::scope("/boards")
                     .route("{name}", web::get().to(handlers::board::board_pg))
+                    .route("{name}/posts", web::get().to(handlers::board::get_posts))
                     .service(
                         web::scope("{name}")
                             .wrap(handlers::middleware::LoginAuth)

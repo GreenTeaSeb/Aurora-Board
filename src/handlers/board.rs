@@ -1,9 +1,13 @@
+use super::post::Post;
 use super::user::{check_if_joined_board, get_user_boards, UserBoards};
-use super::post::{Post,get_all_posts};
 use crate::handlers::user::{self, User};
 use actix_files as fs;
 use actix_identity::Identity;
-use actix_web::{self, web, HttpMessage, HttpRequest, HttpResponse, Responder};
+use actix_web::{
+    self,
+    web::{self, Query},
+    HttpMessage, HttpRequest, HttpResponse, Responder,
+};
 use anyhow::{anyhow, Result};
 use sailfish::TemplateOnce;
 use serde::{Deserialize, Serialize};
@@ -32,9 +36,19 @@ struct BoardTemplate {
     user: anyhow::Result<User>,
     is_in: bool,
     user_boards: Vec<UserBoards>,
-    posts: Vec<Post>
+    posts: Vec<Post>,
 }
 
+#[derive(Deserialize, Debug)]
+pub struct BoardQuery {
+    page: Option<u32>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct GetPostsQuery {
+    limit: u32,
+    offset: u32,
+}
 // LOGIC FUNCTIONS
 
 async fn create_board(id: u32, form: NewBoardData, pool: &MySqlPool) -> Result<String> {
@@ -107,6 +121,30 @@ DELETE FROM members where user_id = ? and  (select id from boards where name = ?
     Ok(())
 }
 
+pub async fn get_n_posts(
+    board_name: String,
+    pool: &MySqlPool,
+    limit: u32,
+    offset: u32,
+) -> Vec<Post> {
+    sqlx::query_as!(
+        Post,
+        r#"
+select * from posts
+where board_id = (select id from boards where name = ?)
+order by created_at desc
+limit ?
+offset ?
+"#,
+        board_name,
+        limit,
+        offset * limit
+    )
+    .fetch_all(pool)
+    .await
+    .unwrap_or_default()
+}
+
 // FRONTEND
 
 pub async fn newboard_pg() -> std::io::Result<fs::NamedFile> {
@@ -117,6 +155,7 @@ pub async fn board_pg(
     id: Identity,
     req: HttpRequest,
     pool: web::Data<MySqlPool>,
+    q: Query<BoardQuery>,
 ) -> impl Responder {
     let board = req.match_info().get("name").ok_or("").unwrap_or_default();
     let id: u32 = id
@@ -126,6 +165,7 @@ pub async fn board_pg(
         .unwrap_or_default();
     let user_data = user::get_by_id(&id, pool.get_ref()).await;
     let board_data = get_by_name(board, pool.get_ref()).await;
+    let offset = q.page.unwrap_or_default();
     match board_data {
         Ok(b) => {
             let temp = BoardTemplate {
@@ -135,7 +175,7 @@ pub async fn board_pg(
                     .await
                     .unwrap_or_default(),
                 user_boards: get_user_boards(id, pool.get_ref()).await,
-                posts: get_all_posts(board.to_string(),pool.get_ref()).await
+                posts: get_n_posts(board.to_string(), pool.get_ref(), 10, offset).await,
             };
             HttpResponse::Found().body(temp.render_once().unwrap())
         }
@@ -192,4 +232,14 @@ pub async fn newboard(
             .json(id),
         Err(e) => HttpResponse::UnprocessableEntity().body(e.to_string()),
     }
+}
+
+pub async fn get_posts(
+    req: HttpRequest,
+    pool: web::Data<MySqlPool>,
+    q: Query<GetPostsQuery>,
+) -> impl Responder {
+    let board = req.match_info().get("name").ok_or("").unwrap_or_default();
+    HttpResponse::Found()
+        .json(get_n_posts(board.to_string(), pool.get_ref(), q.limit, q.offset).await)
 }

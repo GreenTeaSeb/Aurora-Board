@@ -1,8 +1,16 @@
+default:
+    cargo run --release
 
 watch-sass:
-    node-sass --watch scss -o static/css 
-
-watch-source:
+    sass --watch scss:static/css --style compressed
+watch-src:
     cargo watch -x "run"
+
+sass:
+    sass scss:static/css --style compressed
+
+src:
+    cargo run
+
 clean:
   cargo clean
