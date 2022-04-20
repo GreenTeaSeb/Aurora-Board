@@ -4,6 +4,7 @@ $secondary-text: #eeeeeeb3;
 $surface: #313131;
 $primary: #4670c2;
 $secondary: #6cdbc3;
+$border: 2px solid $bg;
 
 $margin: 2rem;
 $padding: 1rem;
@@ -42,10 +43,11 @@ $shadow: 0 0 10px black;
 ::-webkit-scrollbar-thumb {
   -webkit-box-shadow: none;
   box-shadow: none;
-  border-radius: 10px;  background: $secondary-text;
+  border-radius: 10px;
+  background: $secondary-text;
 }
 
-.button {
+@mixin button {
   font-family: $big-font;
   color: $secondary-text;
   border-radius: $border-radius;
@@ -63,12 +65,110 @@ $shadow: 0 0 10px black;
   }
 }
 
-.main-button {
+@mixin main-button {
   background: linear-gradient(45deg, $primary, $secondary);
   color: $text;
   padding: 0 0.5rem;
   &:hover {
     box-shadow: 0 0 5px $primary;
+  }
+}
+
+@mixin section {
+  background: $surface;
+  padding: $padding;
+  &:first-child {
+    border-radius: $border-radius $border-radius 2px 2px;
+  }
+  &:not(:first-child) {
+    border-top: $border;
+    border-radius: 2px;
+    // margin-top: 1px;
+  }
+  &:last-child {
+    border-radius: 2px 2px $border-radius $border-radius;
+  }
+  .title {
+    font-family: $big-font;
+    text-align: center;
+    color: linear-gradient(45deg, $primary, $secondary);
+    margin: 0;
+  }
+  p {
+    margin: 0;
+    font-family: $main-font;
+  }
+  a {
+    text-decoration: none;
+    color: $text;
+  }
+  ol,
+  ul {
+    margin: 0;
+    padding: 0 $padding;
+  }
+  li {
+    color: $text;
+    .entry {
+      display: inline-flex;
+      vertical-align: middle;
+      align-items: center;
+      gap: $padding;
+      padding: 0.5rem;
+      width: 100%;
+      img {
+        width: 3rem;
+        aspect-ratio: 1;
+        object-fit: cover;
+        border-radius: 360px;
+        border: 0.25rem solid $bg;
+      }
+      .name {
+        flex: 1;
+      }
+      .count {
+        float: left;
+      }
+    }
+  }
+}
+
+@mixin loading {
+  .dot {
+    width: 10px;
+    height: 10px;
+    margin: 0 2px;
+    display: inline-block;
+    border-radius: 50%;
+    animation: loader-scale 1.4s infinite ease-in-out both;
+    background: #525252;
+  }
+  .dot:nth-child(2) {
+    animation-delay: 0.16s;
+  }
+  .dot:nth-child(3) {
+    animation-delay: 0.32s;
+  }
+}
+@keyframes loader-scale {
+  0%,
+  80%,
+  100% {
+    transform: scale(1);
+  }
+
+  40% {
+    transform: scale(0);
+  }
+}
+
+@keyframes scale-up {
+  100% {
+    transform: scaleY(1);
+  }
+
+  0% {
+    transform: scale(0);
   }
 }
 

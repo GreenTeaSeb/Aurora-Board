@@ -3,7 +3,6 @@
 .tile {
   display: flex;
   flex-direction: column;
-  width: 100%;
   .header {
     display: flex;
     .data {
@@ -16,22 +15,23 @@
         gap: 1rem;
         color: $text;
         font-family: $big-font;
-        border-bottom: 2px solid $bg;
+        border-bottom: $border;
         padding: calc($padding/2) $padding;
         align-items: center;
-	.title{
-	    flex: 1;
-	    overflow: hidden;
-	    text-overflow: ellipsis;
-	}
-	.time{
-	    color: $secondary-text;
-	}
+        .title {
+          flex: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .time {
+          color: $secondary-text;
+        }
         .pfp {
           height: 3rem;
           aspect-ratio: 1;
           object-fit: cover;
           border-radius: 360px;
+	  border: 0.25rem solid $bg
           // box-shadow: 0 0 20px black;
         }
       }
@@ -51,7 +51,7 @@
       background-color: $surface;
       border-radius: 2px $border-radius $border-radius 2px;
       // margin-left: 1px;
-      border-left: 2px solid $bg;
+      border-left: $border;
       float: right;
       display: flex;
       flex-direction: column;
@@ -64,9 +64,18 @@
         color: $secondary-text;
       }
     }
+    &:not(:last-child) {
+      .options {
+        border-radius: 2px $border-radius 0 0;
+      }
+      .data {
+        border-radius: $border-radius 2px 0 0;
+      }
+    }
   }
   img {
     object-fit: cover;
     max-height: 30rem;
+    border-radius: 0 0 $border-radius $border-radius;
   }
 }

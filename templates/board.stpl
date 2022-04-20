@@ -33,7 +33,7 @@
 		      <div class="info">
 			<img class= "pfp"src="/data/defaults/default_pfp.webp" alt=""> 
 			<p class="title"><%= post.title %></p>		
-			<p class="time"><%= post.created_at.format("%x").to_string() %></p>	
+			<p class="time"><%= super::post::time_msg(post.created_at)%></p>	
 		      </div>
 		      <pre class="text"><%= post.text %></pre>
 		    </div>
@@ -49,6 +49,7 @@
 		</div>
 		<%};%>
 		</div>
+		<% include!("./loading.stpl");%>
             </div>
             <aside id="sidebar-right" class="sidebar">
 		<div id="board-info" class="panel"> 	

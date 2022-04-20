@@ -34,6 +34,7 @@ const prevent = (e) => {
       window.location.replace(res.url);
     })
     .catch((err) => {
+	errors.style.display = "block"
       errors.innerText = err;
     });
 }

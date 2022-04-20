@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Login Aurora Board</title>
-    <link rel="stylesheet" href="/css/login.css" />
+    <link rel="stylesheet" href="/css/form.css" />
     <script src="form.js" type="module" defer></script>
     <!-- text font -->
       <link
@@ -15,9 +15,9 @@
   <body>
     <div id="display" class="">
       <div id="content" class="">
-        <div id="title">New Board</div>
-        <form method="post" id="newboard" action="/boards">
-	  <div id="inputs">
+        <form method="post" id="newboard" action="/boards" >
+          <div id="title" class="section">New Board</div>
+	  <div id="inputs"class="section">
 			    <label>
 			       <input
 		type="text"
@@ -37,9 +37,10 @@
 			    </label>
 	  </div>
 
-	  <p id="errors" ></p>
+	  <p id="errors" class="section"></p>
+	  <div id="button-section" class="section">
           <button id="submit" type="submit" class="button main-button">Create</button>
-
+	  </div>
         </form>
       </div>
     </div>
