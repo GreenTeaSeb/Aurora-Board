@@ -30,7 +30,7 @@
           height: 3rem;
           aspect-ratio: 1;
           object-fit: cover;
-          border-radius: 360px;
+          border-radius: $img-radius;
 	  border: 0.25rem solid $bg
           // box-shadow: 0 0 20px black;
         }

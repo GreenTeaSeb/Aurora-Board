@@ -94,7 +94,7 @@
         height: 100%;
         aspect-ratio: 1;
         object-fit: cover;
-        border-radius: 360px;
+        border-radius: $img-radius;
 	  border: 0.25rem solid $bg
       }
     }

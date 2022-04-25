@@ -10,6 +10,10 @@
 .main-button {
   @include main-button;
 }
+.hover{
+    @include hover-effect;
+}
+
 body {
   main {
     display: flex;
@@ -23,21 +27,21 @@ body {
       flex-direction: column;
       gap: $margin;
       max-width: 60rem;
-      .loading{
-	@include loading;
-	justify-content: center;
-	padding-bottom: $margin;
-	display: none;
+      .loading {
+        @include loading;
+        justify-content: center;
+        padding-bottom: $margin;
+        display: none;
       }
       .page {
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 2rem;
-	align-items: stretch;
+        align-items: stretch;
         padding-bottom: $margin;
       }
-      .page:not(:nth-last-child(2)){
+      .page:not(:nth-last-child(2)) {
         border-bottom: 2px dashed $surface;
       }
     }
@@ -67,6 +71,12 @@ body {
         }
       }
     }
+    // TEMP REMOVE IN FUTURE
+      #sidebar-left{
+	 .section:first-child, .section:last-child{
+	    padding: $padding;
+	 }
+      }
     .sidebar {
       display: flex;
       flex-direction: column;
@@ -90,19 +100,24 @@ body {
         width: 100%;
         max-height: inherit;
         .section {
-	    @include section; 
+          @include section;
+	    .button{
+		padding: $padding;
+	    }
+
         }
         #info {
           display: flex;
           flex-direction: column;
           align-items: center;
           text-align: center;
+          padding: $padding;
           #icon {
             height: 5rem;
             width: 5rem;
             object-fit: cover;
-            border-radius: 360px;
-            border: 0.5rem solid $bg;
+            border-radius: $img-radius;
+            border: 0.25rem solid $bg;
           }
         }
 
@@ -113,10 +128,16 @@ body {
           form {
             display: flex;
             justify-content: center;
+            label {
+              display: contents;
+            }
             input {
               border: none;
-              width: 100%;
               background: none;
+              color: inherit;
+              font-family: inherit;
+              font-size: inherit;
+              padding: 0;
             }
           }
         }
@@ -148,4 +169,3 @@ body {
     background: rgba(0, 0, 0, 0.5);
   }
 }
-

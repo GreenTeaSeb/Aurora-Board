@@ -37,6 +37,7 @@ const tile_template = document.getElementById("tile-template");
 const get_posts = async () => {
   if (main.offsetHeight + main.scrollTop >= main.scrollHeight) {
     posts_loading.style.display = "flex";
+await new Promise(r => setTimeout(r, 2000));
     const url = baseurl + "?page=" + (offset + 1);
     console.debug("Fetching at: " + url);
     const res = await fetch(url);
@@ -44,7 +45,7 @@ const get_posts = async () => {
     let html_parsed = parser.parseFromString(html, "text/html");
     const page = html_parsed.querySelector(".page");
     if (!page.childElementCount) {
-	alert("no more posts")
+	// alert("no more posts")
       posts_loading.style.display = "none";
       await new Promise((r) => setTimeout(r, 2000));
       return;

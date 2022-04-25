@@ -12,6 +12,7 @@ $navbar-height: 2.5rem;
 $sidebar-width: 20rem;
 $search-width: 50rem;
 $border-radius: 0.5rem;
+$img-radius: 0.5rem;
 $big-font: "Catamaran", Sans-Serif;
 $main-font: "Merriweather Sans", sans-serif;
 $shadow: 0 0 10px black;
@@ -50,7 +51,6 @@ $shadow: 0 0 10px black;
 @mixin button {
   font-family: $big-font;
   color: $secondary-text;
-  border-radius: $border-radius;
   transition: 0.1s;
   text-decoration: none;
   height: inherit;
@@ -59,10 +59,17 @@ $shadow: 0 0 10px black;
   align-items: center;
   font-size: medium;
   justify-content: center;
+}
+
+@mixin hover-effect{
+
+    transition: 0.1s;
   &:hover {
     color: $text;
-    transform: scale(1.1);
+    // transform: scale(1.1);
+    background: #484848;
   }
+
 }
 
 @mixin main-button {
@@ -76,7 +83,7 @@ $shadow: 0 0 10px black;
 
 @mixin section {
   background: $surface;
-  padding: $padding;
+  // padding: $padding;
   &:first-child {
     border-radius: $border-radius $border-radius 2px 2px;
   }
@@ -84,9 +91,14 @@ $shadow: 0 0 10px black;
     border-top: $border;
     border-radius: 2px;
     // margin-top: 1px;
+    overflow: clip;
   }
   &:last-child {
+    overflow: clip;
     border-radius: 2px 2px $border-radius $border-radius;
+  }
+  &:only-child{
+    border-radius: $padding;
   }
   .title {
     font-family: $big-font;
@@ -105,22 +117,24 @@ $shadow: 0 0 10px black;
   ol,
   ul {
     margin: 0;
-    padding: 0 $padding;
+    padding: 0;
   }
   li {
     color: $text;
+    @include hover-effect; 
     .entry {
       display: inline-flex;
       vertical-align: middle;
       align-items: center;
       gap: $padding;
       padding: 0.5rem;
-      width: 100%;
+	width: 100%;
+	box-sizing: border-box;
       img {
         width: 3rem;
         aspect-ratio: 1;
         object-fit: cover;
-        border-radius: 360px;
+        border-radius: $img-radius;
         border: 0.25rem solid $bg;
       }
       .name {
