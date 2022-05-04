@@ -13,10 +13,15 @@
    <body>
 	<dialog  id="newpost-modal" class="modal">
 	    <form action="" method="post" class="panel">    
-		<input type="text" name="title" id="title" required>
-		<textarea name="text" id="text" rows="8" cols="40"></textarea>
-		<button id="submit" type="submit" class="button main-button">Create</button>
-
+	    <div id="inputs" class="section">  	
+		<label>	
+			<input type="text" name="title" id="title" placeholder="title" required>
+		</label>
+		<label class="textarea">	
+			<textarea name="text" id="text" rows="8" cols="40" placeholder="text" required></textarea>
+		</label>
+			<button id="submit" type="submit" class="button main-button">Create</button>
+		</div>
 	    </form>	
 	</dialog>
          <% include!("./navbar.stpl"); %>
@@ -26,7 +31,11 @@
             </aside>
             <div id="posts">
 		<div class="page">
-  		<% for post in posts { include!("./tiletemplate.stpl");};%>
+  		<% for post in posts { %>
+		    <div class="tile">
+		<% include!("./tiletemplate.stpl");%>
+		    </div>
+		    <%};%>
 		</div>
 		<% include!("./loading.stpl");%>
             </div>

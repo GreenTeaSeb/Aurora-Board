@@ -10,11 +10,18 @@
 .main-button {
   @include main-button;
 }
-.hover{
-    @include hover-effect;
+.hover {
+  @include hover-effect;
 }
 
 body {
+  #newpost-modal {
+    @include form;
+    background: none;
+    border: 0;
+    outline: 0;
+    padding: 0;
+  }
   main {
     display: flex;
     justify-content: center;
@@ -72,11 +79,12 @@ body {
       }
     }
     // TEMP REMOVE IN FUTURE
-      #sidebar-left{
-	 .section:first-child, .section:last-child{
-	    padding: $padding;
-	 }
+    #sidebar-left {
+      .section:first-child,
+      .section:last-child {
+        padding: $padding;
       }
+    }
     .sidebar {
       display: flex;
       flex-direction: column;
@@ -101,10 +109,9 @@ body {
         max-height: inherit;
         .section {
           @include section;
-	    .button{
-		padding: $padding;
-	    }
-
+          .button {
+            padding: $padding;
+          }
         }
         #info {
           display: flex;

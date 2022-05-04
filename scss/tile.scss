@@ -3,13 +3,21 @@
 .tile {
   display: flex;
   flex-direction: column;
+  .src{
+   color: $secondary-text;  
+   font-family: $big-font;
+   text-decoration: none;
+   font-size: smaller;
+   margin-bottom: 0.25rem;
+  }
   .header {
     display: flex;
     .data {
-      border-radius: $border-radius 2px 2px $border-radius;
+      border-radius: $border-radius $border-inner $border-inner  $border-radius;
       background-color: $surface;
       min-width: 0;
-      width: 100%;
+      flex: 1;
+      border-right: $border;
       .info {
         display: flex;
         gap: 1rem;
@@ -31,32 +39,36 @@
           aspect-ratio: 1;
           object-fit: cover;
           border-radius: $img-radius;
-	  border: 0.25rem solid $bg
+          border: 0.25rem solid $bg;
           // box-shadow: 0 0 20px black;
         }
       }
       .text {
-        color: $secondary-text;
-        font-family: $main-font;
-        margin: $padding;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        display: -webkit-box !important;
-        -webkit-line-clamp: 4;
-        -webkit-box-orient: vertical;
-        white-space: normal;
+          border-top: $border;
+	  padding: $padding;
+        pre {
+          color: $secondary-text;
+          font-family: $main-font;
+          margin: 0;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          display: -webkit-box !important;
+          -webkit-line-clamp: 4;
+          -webkit-box-orient: vertical;
+          white-space: normal;
+        }
       }
     }
     .options {
       background-color: $surface;
-      border-radius: 2px $border-radius $border-radius 2px;
+      border-radius:  $border-inner  $border-radius $border-radius  $border-inner ;
       // margin-left: 1px;
       border-left: $border;
       float: right;
       display: flex;
       flex-direction: column;
       justify-content: center;
-
+      overflow: clip;
       svg {
         padding: $padding;
         flex: 1;
@@ -66,10 +78,10 @@
     }
     &:not(:last-child) {
       .options {
-        border-radius: 2px $border-radius 0 0;
+        border-radius: $border-inner $border-radius 0 0;
       }
       .data {
-        border-radius: $border-radius 2px 0 0;
+        border-radius: $border-radius $border-inner 0 0;
       }
     }
   }

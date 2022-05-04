@@ -5,6 +5,7 @@
 	<!-- custom -->
     <title>Aurora Board</title>
     <link rel="stylesheet" href="/css/home.css" />
+      <script type="module" src="/home.js"></script>
      </head>
   <body>
      <% include!("./navbar.stpl"); %>
@@ -14,6 +15,15 @@
 	</aside>
 
 	<div id="posts">
+		<div class="page">
+  		<% for post in posts { %>
+		    <div class="tile">	
+			<a class="src" href=  <%= format!("\"/boards/{}\"", post.board_name.clone().unwrap_or_default() ) %> ><%= post.board_name.unwrap_or_default() %></a>
+		<% include!("./tiletemplate.stpl");%>
+		    </div>
+		    <%};%>
+		</div>
+		<% include!("./loading.stpl");%>
 
        </div>
        <aside id="sidebar-right" class="sidebar">

@@ -95,8 +95,12 @@
         aspect-ratio: 1;
         object-fit: cover;
         border-radius: $img-radius;
-	  border: 0.25rem solid $bg
+	  border: 0.25rem solid $bg;
+	  box-sizing: border-box;
       }
+    }
+    .button{
+	border-radius: $img-radius;
     }
     @include for_breakpoint(mobile) {
       display: none;
