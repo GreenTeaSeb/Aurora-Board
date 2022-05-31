@@ -6,6 +6,7 @@ $primary: #4670c2;
 $secondary: #6cdbc3;
 $border: 1px solid $bg;
 
+$pfp: #86d28f;
 $margin: 2rem;
 $padding: 1rem;
 $navbar-height: 2.5rem;
@@ -83,6 +84,7 @@ $shadow: 0 0 10px black;
 @mixin section {
   background: $surface;
   // padding: $padding;
+  overflow: clip;
   &:first-child {
     border-radius: $border-radius $border-radius $border-inner $border-inner;
     border-bottom: $border;
@@ -99,7 +101,7 @@ $shadow: 0 0 10px black;
     border-radius:  $border-inner $border-inner $border-radius $border-radius;
   }
   &:only-child {
-    border-radius: $padding;
+    border-radius: $border-radius;
   }
   .title {
     font-family: $big-font;
@@ -107,11 +109,9 @@ $shadow: 0 0 10px black;
     color: linear-gradient(45deg, $primary, $secondary);
     margin: 0;
   }
-  p {
+  p,a{
     margin: 0;
     font-family: $main-font;
-  }
-  a {
     text-decoration: none;
     color: $text;
   }
@@ -119,10 +119,14 @@ $shadow: 0 0 10px black;
   ul {
     margin: 0;
     padding: 0;
+    list-style-type: none;
   }
   li {
     color: $text;
     @include hover-effect;
+    &:not(:first-child){
+	border-top: 1px solid #484848;
+    }
     .entry {
       display: inline-flex;
       vertical-align: middle;
@@ -193,7 +197,6 @@ $shadow: 0 0 10px black;
 }
 
 @mixin  form{
-border-radius: 12px;
     text-align: center;
     box-shadow: 0 0 20px black;
     .section {

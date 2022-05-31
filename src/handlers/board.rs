@@ -1,17 +1,21 @@
 use super::post::Post;
-use super::user::{check_if_joined_board, get_user_boards, UserBoards};
+use super::user::{check_if_joined_board, check_if_owner, get_user_boards, UserBoards};
 use crate::handlers::user::{self, User};
 use actix_files as fs;
 use actix_identity::Identity;
+use actix_multipart::Multipart;
 use actix_web::{
     self,
     web::{self, Query},
     HttpMessage, HttpRequest, HttpResponse, Responder,
 };
-use anyhow::{anyhow, Result};
+use anyhow::{anyhow, Context, Result};
+use futures_util::TryStreamExt as _;
 use sailfish::TemplateOnce;
 use serde::{Deserialize, Serialize};
 use sqlx::{types::chrono, FromRow, MySqlPool};
+use std::io::Write;
+use std::env;
 
 #[derive(Serialize, FromRow, Debug)]
 pub struct Board {
@@ -35,6 +39,7 @@ struct BoardTemplate {
     board: Board,
     user: anyhow::Result<User>,
     is_in: bool,
+    is_owner: bool,
     user_boards: Vec<UserBoards>,
     posts: Vec<Post>,
 }
@@ -111,7 +116,7 @@ VALUES (?, (select id from boards where name = ? ) , ?)
 async fn user_leave(id: &u32, board: &str, pool: &MySqlPool) -> Result<()> {
     sqlx::query!(
         r#"
-DELETE FROM members where user_id = ? and  (select id from boards where name = ? ) 
+DELETE FROM members where user_id = ? and board_id = (select id from boards where name = ? ) 
 	"#,
         id,
         board
@@ -145,6 +150,42 @@ offset ?
     .unwrap_or_default()
 }
 
+async fn save_icon(mut payload: Multipart, board: String) -> Result<String> {
+    while let Some(mut field) = payload.try_next().await? {
+        let extension = field
+            .content_disposition()
+            .get_filename()
+            .context("Missing file name!")?
+            .split(".")
+            .last()
+            .context("Missing file type")?;
+        let name = format!("{}.{}", board, extension);
+        let data_dir = env::var("DATA")?;
+        let path = format!("{}/{}",data_dir, name);
+        let mut file = web::block(|| std::fs::File::create(path)).await??;
+        while let Some(chunk) = field.try_next().await? {
+            file = web::block(move || file.write_all(&chunk).map(|_| file)).await??;
+        }
+        return Ok(name);
+    }
+    anyhow::bail!("No  payload");
+}
+
+async fn set_icon(board: String, file_name: String, pool: &MySqlPool) -> Result<()> {
+    sqlx::query!(
+        r#"
+update boards
+set icon = ? 
+where name = ?
+        "#,
+        format!("/data/{}",file_name),
+        board
+    )
+    .execute(pool)
+    .await?;
+    Ok(())
+}
+
 // FRONTEND
 
 pub async fn newboard_pg() -> std::io::Result<fs::NamedFile> {
@@ -166,14 +207,23 @@ pub async fn board_pg(
     let user_data = user::get_by_id(&id, pool.get_ref()).await;
     let board_data = get_by_name(board, pool.get_ref()).await;
     let offset = q.page.unwrap_or_default();
+    let isin = check_if_joined_board(id, board, pool.get_ref())
+        .await
+        .unwrap_or_default();
+
     match board_data {
         Ok(b) => {
             let temp = BoardTemplate {
                 user: user_data,
                 board: b,
-                is_in: check_if_joined_board(id, board, pool.get_ref())
-                    .await
-                    .unwrap_or_default(),
+                is_in: isin,
+                is_owner: if isin {
+                    check_if_owner(id, board, pool.get_ref())
+                        .await
+                        .unwrap_or_default()
+                } else {
+                    false
+                },
                 user_boards: get_user_boards(id, pool.get_ref()).await,
                 posts: get_n_posts(board.to_string(), pool.get_ref(), 10, offset).await,
             };
@@ -242,4 +292,20 @@ pub async fn get_posts(
     let board = req.match_info().get("name").ok_or("").unwrap_or_default();
     HttpResponse::Found()
         .json(get_n_posts(board.to_string(), pool.get_ref(), q.limit, q.offset).await)
+}
+
+pub async fn new_icon(req: HttpRequest, mut payload: Multipart, pool: web::Data<MySqlPool>) -> impl Responder { 
+    let id = req.extensions().get::<u32>().unwrap().to_owned();
+    let board = req.match_info().get("name").ok_or("").unwrap_or_default();
+    if let Ok(res) = check_if_owner(id, board, pool.get_ref()).await{
+        if  res {
+          if let Ok(name) = save_icon(payload, board.to_string()).await {
+                set_icon(board.to_string(),name, pool.get_ref()).await;
+            }
+        }
+    }
+
+      HttpResponse::SeeOther()
+        .append_header(("location", format!("/boards/{}", board)))
+        .finish()
 }

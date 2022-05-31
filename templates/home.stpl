@@ -18,7 +18,10 @@
 		<div class="page">
   		<% for post in posts { %>
 		    <div class="tile">	
-			<a class="src" href=  <%= format!("\"/boards/{}\"", post.board_name.clone().unwrap_or_default() ) %> ><%= post.board_name.unwrap_or_default() %></a>
+			<a class="src" href=  <%= format!("\"/boards/{}\"", post.board_name.clone().unwrap_or_default() ) %> >
+			    <img src= <%= format!("\"{}\"", post.board_icon.clone().unwrap_or_default() ) %> alt="">
+			    <%= post.board_name.unwrap_or_default() %>
+			</a>
 		<% include!("./tiletemplate.stpl");%>
 		    </div>
 		    <%};%>
@@ -46,7 +49,7 @@
 	   </ol>
 	 </div>	
 	 <div id="options" class="section">
-	   <a href="/boards" class ="button">New board</a>
+	   <a href="/boards" class ="button hover">New board</a>
 	 </div>
 	</div>
 	</aside>

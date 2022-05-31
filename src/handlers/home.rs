@@ -1,11 +1,13 @@
 use super::user::{get_user_boards, UserBoards};
 use crate::handlers::user::{get_by_id, User};
 use actix_identity::Identity;
-use actix_web::{    web::{self, Query}, HttpResponse};
+use actix_web::{
+    web::{self, Query},
+    HttpResponse,
+};
 use sailfish::TemplateOnce;
+use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, MySqlPool};
-use serde::{Deserialize,Serialize};
-
 
 #[derive(Serialize, FromRow, Debug)]
 pub struct BoardPost {
@@ -13,6 +15,7 @@ pub struct BoardPost {
     pub created_at: chrono::DateTime<chrono::Utc>,
     pub poster_id: u32,
     pub board_name: Option<String>,
+    pub board_icon: Option<String>,
     pub title: String,
     pub text: String,
 }
@@ -23,7 +26,7 @@ struct HomeTemplate {
     user: anyhow::Result<User>,
     top_boards: Vec<BoardEntry>,
     user_boards: Vec<UserBoards>,
-    posts: Vec<BoardPost>
+    posts: Vec<BoardPost>,
 }
 
 struct BoardEntry {
@@ -57,12 +60,11 @@ pub async fn get_member_posts(
     pool: &MySqlPool,
     limit: u32,
     offset: u32,
-
 ) -> Vec<BoardPost> {
     sqlx::query_as!(
         BoardPost,
         r#"
-SELECT posts.id ,posts.created_at ,posts.poster_id ,( select name from boards where id = posts.board_id) as board_name ,posts.title ,posts.`text` FROM posts
+SELECT posts.id ,posts.created_at ,posts.poster_id ,( select name from boards where id = posts.board_id) as board_name, ( select icon from boards where id = posts.board_id) as board_icon ,posts.title ,posts.`text` FROM posts
 INNER JOIN members on members.board_id = posts.board_id 
 where members.user_id  = ?
 ORDER BY posts.created_at DESC
@@ -75,8 +77,11 @@ offset ?;
     .unwrap_or_default()
 }
 
-
-pub async fn home(id: Identity, pool: web::Data<MySqlPool>, q: Query<GetPostsQuery>) -> HttpResponse {
+pub async fn home(
+    id: Identity,
+    pool: web::Data<MySqlPool>,
+    q: Query<GetPostsQuery>,
+) -> HttpResponse {
     let id_int: u32 = id
         .identity()
         .unwrap_or_default()
@@ -88,7 +93,7 @@ pub async fn home(id: Identity, pool: web::Data<MySqlPool>, q: Query<GetPostsQue
         user: user_res,
         top_boards: top,
         user_boards: get_user_boards(id_int, pool.get_ref()).await,
-        posts: get_member_posts(&id_int, pool.get_ref(), 10, q.page.unwrap_or_default()).await
+        posts: get_member_posts(&id_int, pool.get_ref(), 10, q.page.unwrap_or_default()).await,
     };
     HttpResponse::Ok().body(temp.render_once().unwrap())
 }

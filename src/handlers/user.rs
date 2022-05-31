@@ -3,6 +3,7 @@ use actix_web::{web, HttpRequest, HttpResponse};
 use anyhow::Result;
 use sailfish::TemplateOnce;
 use sqlx::MySqlPool;
+use super::home::BoardPost;
 
 #[derive(Debug)]
 pub struct User {
@@ -21,6 +22,9 @@ pub struct User {
 struct UserTemplate {
     user: Result<User>,
     user_guest: User,
+    user_boards: Vec<UserBoards>,
+    posts: Vec<BoardPost>,
+
 }
 
 pub async fn get_by_id(id: &u32, pool: &MySqlPool) -> Result<User> {
@@ -36,7 +40,7 @@ pub async fn get_by_id(id: &u32, pool: &MySqlPool) -> Result<User> {
     .await?)
 }
 
-pub async fn get(id: Identity, req: HttpRequest, pool: web::Data<MySqlPool>) -> HttpResponse {
+pub async fn user_page(id: Identity, req: HttpRequest, pool: web::Data<MySqlPool>) -> HttpResponse {
     let id_guest = req.match_info().get("id").ok_or("no such id");
     let id_guest_int: u32 = id_guest.unwrap_or_default().parse().unwrap_or_default();
     let user_guest_data = get_by_id(&id_guest_int, pool.get_ref()).await;
@@ -52,6 +56,9 @@ pub async fn get(id: Identity, req: HttpRequest, pool: web::Data<MySqlPool>) -> 
             let temp = UserTemplate {
                 user: user_data,
                 user_guest: u,
+                user_boards: get_user_boards(id_int, pool.get_ref()).await,
+                // posts: get_member_posts(&id_int, pool.get_ref(), 10, q.page.unwrap_or_default()).await,
+                posts: Vec::default()
             };
 
             HttpResponse::Ok().body(temp.render_once().unwrap())
@@ -75,6 +82,19 @@ WHERE board_id = (SELECT id FROM boards WHERE name = ?) AND user_id = ?
         != 0)
 }
 
+pub async fn check_if_owner(id: u32, board: &str, pool: &MySqlPool) -> Result<bool> {
+    Ok(sqlx::query!(
+        r#"
+SELECT IF(boards.owner_id = ?, true,false) as is_owner FROM boards WHERE boards.name = ?;
+"#,
+        id,
+        board
+    )
+    .fetch_one(pool)
+    .await?
+    .is_owner
+        != 0)
+}
 pub struct UserBoards {
     pub name: String,
     pub icon: String,

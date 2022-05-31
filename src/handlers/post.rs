@@ -1,9 +1,9 @@
 use super::user::check_if_joined_board;
 use actix_web::{self, web, HttpMessage, HttpRequest, HttpResponse, Responder};
 use anyhow::Result;
+use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, MySqlPool};
-use chrono::Utc;
 
 #[derive(Deserialize)]
 pub struct NewPostdata {
@@ -63,18 +63,16 @@ pub async fn newpost(
     }
 }
 
-pub fn time_msg(old: chrono::DateTime<Utc>) -> String{
+pub fn time_msg(old: chrono::DateTime<Utc>) -> String {
     let new = Utc::now();
-   let diff =  new.signed_duration_since(old);
-   let mins = diff.num_minutes();
-   match mins {
-      0 => return String::from("a few seconds ago"),
-      1 => return format!("{} minute ago",mins),
-      2..=59 => return format!("{} minutes ago",mins),
-      60..=119 => return format!("{} hour ago", diff.num_hours()),
-      120..=1439 => return format!("{} hours ago", diff.num_hours()),
-      _ => return old.format("%x").to_string()
-   }
+    let diff = new.signed_duration_since(old);
+    let mins = diff.num_minutes();
+    match mins {
+        0 => return String::from("a few seconds ago"),
+        1 => return format!("{} minute ago", mins),
+        2..=59 => return format!("{} minutes ago", mins),
+        60..=119 => return format!("{} hour ago", diff.num_hours()),
+        120..=1439 => return format!("{} hours ago", diff.num_hours()),
+        _ => return old.format("%x").to_string(),
+    }
 }
-
-

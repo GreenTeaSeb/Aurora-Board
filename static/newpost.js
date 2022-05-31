@@ -21,6 +21,8 @@
 
 const newpost_button = document.getElementById("newpost-button");
 const newpost_modal = document.getElementById("newpost-modal");
+const boardimg_modal = document.getElementById("boardimg-modal");
+const boardimg_button = document.getElementById("boardimg-edit");
 const posts = document.getElementById("posts");
 const posts_loading = posts.querySelector(".loading");
 const main = document.getElementById("content");
@@ -59,5 +61,9 @@ await new Promise(r => setTimeout(r, 2000));
 newpost_button.addEventListener("click", () => {
   newpost_modal.showModal();
 });
+boardimg_button.addEventListener("click", () => {
+  boardimg_modal.showModal();
+});
+
 
 main.addEventListener("scroll", get_posts);

@@ -4,16 +4,47 @@
 <% include!("./header.stpl"); %>
 	<!-- custom -->
     <title>Aurora Board - <%=user_guest.username%></title>
-    <link rel="stylesheet" href="/css/home.css" />
- </head>
+     <link rel="stylesheet" href="/css/home.css" />
+      <script type="module" src="/home.js"></script>
+     </head>
   <body>
-    <div id="display" class="">
      <% include!("./navbar.stpl"); %>
-      <div id="content" class="">	
-	<pre style="color:white;white-space:pre-line;">
-	 <%= format!("{:?}", user_guest)%> 
-	 </pre>
-      </div>
-    </div>
+    <main id="content" class="">
+        <aside id="sidebar-left" class="sidebar">
+	    <% include!("./leftside.stpl"); %>
+	</aside>
+	<div id="posts">
+		<div class="page">
+		</div>
+		<% include!("./loading.stpl");%>
+       </div>
+       <aside id="sidebar-right" class="sidebar">
+		<div id="board-info" class="panel"> 	
+		   <div id="info" class="section"> 
+		       <div id="board-img">
+			   <% if let Ok(logged_in) = user { %>
+			   <% if logged_in.id == user_guest.id {%>
+			    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="edit feather feather-edit" id="boardimg-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+			    <%}};%>
+			    <img src= <%= user_guest.pfp %> alt="icon" id="icon">
+			</div>
+			<h2 class="title unselectable"> <%= user_guest.username %> </h2>
+		   </div>
+		    <div id="info" class="section"> 
+			<p>
+			<% match user_guest.bio {
+			     Some(bio) => {
+			%>
+			<%= bio%>
+			<%}, None => { %>
+			No bio
+			<%}}%>
+
+			</p>
+		   </div>
+
+		</div>		
+	</aside>
+    </main>
   </body>
 </html>

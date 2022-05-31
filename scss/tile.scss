@@ -3,17 +3,29 @@
 .tile {
   display: flex;
   flex-direction: column;
-  .src{
-   color: $secondary-text;  
-   font-family: $big-font;
-   text-decoration: none;
-   font-size: smaller;
-   margin-bottom: 0.25rem;
+  .src {
+    color: $secondary-text;
+    font-family: $big-font;
+    text-decoration: none;
+    font-size: smaller;
+    margin-bottom: 0.25rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    img {
+      height: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      border-radius: $img-radius;
+      border: 0.25rem solid $bg;
+      box-sizing: border-box;
+    }
   }
   .header {
     display: flex;
     .data {
-      border-radius: $border-radius $border-inner $border-inner  $border-radius;
+      border-radius: $border-radius $border-inner $border-inner $border-radius;
       background-color: $surface;
       min-width: 0;
       flex: 1;
@@ -27,12 +39,14 @@
         padding: calc($padding/2) $padding;
         align-items: center;
         .title {
-          flex: 1;
+	  flex: 1;
           overflow: hidden;
           text-overflow: ellipsis;
+	  white-space: nowrap;
         }
         .time {
           color: $secondary-text;
+	  margin-left: auto;
         }
         .pfp {
           height: 3rem;
@@ -40,12 +54,13 @@
           object-fit: cover;
           border-radius: $img-radius;
           border: 0.25rem solid $bg;
+	  background-color: $pfp;
           // box-shadow: 0 0 20px black;
         }
       }
       .text {
-          border-top: $border;
-	  padding: $padding;
+        border-top: $border;
+        padding: $padding;
         pre {
           color: $secondary-text;
           font-family: $main-font;
@@ -61,7 +76,7 @@
     }
     .options {
       background-color: $surface;
-      border-radius:  $border-inner  $border-radius $border-radius  $border-inner ;
+      border-radius: $border-inner $border-radius $border-radius $border-inner;
       // margin-left: 1px;
       border-left: $border;
       float: right;

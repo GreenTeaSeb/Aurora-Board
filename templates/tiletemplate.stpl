@@ -1,7 +1,7 @@
 		  <div class="header">
 		    <div class="data">
 		      <div class="info">
-			<img class= "pfp"src="/data/defaults/default_pfp.webp" alt=""> 
+			<img class= "pfp" src="/data/defaults/default_pfp.svg" alt=""> 
 			<p class="title"><%= post.title %></p>		
 			<p class="time"><%= super::post::time_msg(post.created_at)%></p>	
 		      </div>

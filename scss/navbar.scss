@@ -95,6 +95,7 @@
         aspect-ratio: 1;
         object-fit: cover;
         border-radius: $img-radius;
+	  background-color: $pfp;
 	  border: 0.25rem solid $bg;
 	  box-sizing: border-box;
       }

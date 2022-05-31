@@ -15,12 +15,19 @@
 }
 
 body {
-  #newpost-modal {
+ .modal {
     @include form;
     background: none;
     border: 0;
     outline: 0;
     padding: 0;
+    #file-upload{
+	input{
+	    &::file-selector-button{
+	    display: none;
+	    }
+	}
+    }
   }
   main {
     display: flex;
@@ -34,6 +41,8 @@ body {
       flex-direction: column;
       gap: $margin;
       max-width: 60rem;
+      min-width: 0;
+      width: 100%;
       .loading {
         @include loading;
         justify-content: center;
@@ -78,11 +87,11 @@ body {
         }
       }
     }
-    // TEMP REMOVE IN FUTURE
     #sidebar-left {
-      .section:first-child,
-      .section:last-child {
-        padding: $padding;
+      .section:first-child{
+	  li{
+	      padding: $padding;
+	  }
       }
     }
     .sidebar {
@@ -97,9 +106,6 @@ body {
       }
       #user-boards {
         overflow-y: auto;
-        ul {
-          list-style-type: none;
-        }
       }
       .panel {
         display: flex;
@@ -119,12 +125,26 @@ body {
           align-items: center;
           text-align: center;
           padding: $padding;
-          #icon {
-            height: 5rem;
-            width: 5rem;
-            object-fit: cover;
-            border-radius: $img-radius;
-            border: 0.25rem solid $bg;
+          #board-img {
+	    position: relative;
+	    .edit{
+		position: absolute;
+		right: -0.5rem;	
+		top: -0.5rem;	
+		transition: 0.1s;
+		  &:hover {
+		    color: $text;
+		}
+
+	    }
+            #icon {
+              height: 5rem;
+              width: 5rem;
+              object-fit: cover;
+              border-radius: $img-radius;
+              border: 0.25rem solid $bg;
+	      background-color: $pfp;
+            }
           }
         }
 
@@ -162,6 +182,7 @@ body {
     }
     @include for_breakpoint(mobile tablet) {
       flex-direction: column-reverse;
+      gap: $margin;
     }
   }
 }

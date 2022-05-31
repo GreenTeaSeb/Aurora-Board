@@ -19,13 +19,12 @@
     </form>
     <div id="login">
       <% match user {
-	 Ok(u) => {
+	 Ok(ref u) => {
       %>
-      <a href= <%=format!("/user/{}", u.id) %> class="button"> 
-	<p id="username"> <%= u.username %></p>
-	<img alt ="" src= <%= u.pfp %> id="pfp"/>
-	</a>
-      
+	<a href= <%=format!("/users/{}", u.id) %> class="button"> 
+	    <p id="username"> <%= u.username %></p>
+	    <img alt ="" src= <%= u.pfp %> id="pfp"/>
+	</a> 
       <%}, Err(_) => { %>
       <a href="/login" class="button">login</a>
       <a href="/signup" class="button main-button">sign up</a>

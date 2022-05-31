@@ -18,6 +18,7 @@ async fn main() -> Result<()> {
         .expect("PORT is not set")
         .parse::<u16>()
         .expect("Port must be a number");
+    env::var("DATA").expect("Data folder is not set");
     let db_pool = MySqlPool::connect(&database_url).await?;
     let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
     builder
@@ -37,7 +38,7 @@ async fn main() -> Result<()> {
             .route("/logout", web::get().to(handlers::login::logout))
             .route("/signup", web::post().to(handlers::login::signup))
             .route("/login", web::post().to(handlers::login::login))
-            .service(web::scope("/users").route("{id}", web::get().to(handlers::user::get)))
+            .service(web::scope("/users").route("{id}", web::get().to(handlers::user::user_page)))
             .service(
                 web::scope("/boards")
                     .route("{name}", web::get().to(handlers::board::board_pg))
@@ -47,7 +48,8 @@ async fn main() -> Result<()> {
                             .wrap(handlers::middleware::LoginAuth)
                             .route("join", web::post().to(handlers::board::join_board))
                             .route("leave", web::post().to(handlers::board::leave_board))
-                            .route("", web::post().to(handlers::post::newpost)),
+                            .route("", web::post().to(handlers::post::newpost))
+                            .route("icon", web::post().to(handlers::board::new_icon)),
                     )
                     .service(
                         web::scope("")
