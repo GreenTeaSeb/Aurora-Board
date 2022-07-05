@@ -14,8 +14,8 @@ use futures_util::TryStreamExt as _;
 use sailfish::TemplateOnce;
 use serde::{Deserialize, Serialize};
 use sqlx::{types::chrono, FromRow, MySqlPool};
-use std::io::Write;
 use std::env;
+use std::io::Write;
 
 #[derive(Serialize, FromRow, Debug)]
 pub struct Board {
@@ -116,9 +116,22 @@ VALUES (?, (select id from boards where name = ? ) , ?)
 async fn user_leave(id: &u32, board: &str, pool: &MySqlPool) -> Result<()> {
     sqlx::query!(
         r#"
-DELETE FROM members where user_id = ? and board_id = (select id from boards where name = ? ) 
+DELETE FROM members where user_id = ? and board_id = (select id from boards where name = ? )
+
 	"#,
         id,
+        board
+    )
+    .execute(pool)
+    .await?;
+    Ok(())
+}
+
+async fn delete_board_db(board: &str, pool: &MySqlPool) -> Result<()> {
+    sqlx::query!(
+        r#"
+DELETE FROM boards where name = ? ;
+	"#,
         board
     )
     .execute(pool)
@@ -161,7 +174,7 @@ async fn save_icon(mut payload: Multipart, board: String) -> Result<String> {
             .context("Missing file type")?;
         let name = format!("{}.{}", board, extension);
         let data_dir = env::var("DATA")?;
-        let path = format!("{}/{}",data_dir, name);
+        let path = format!("{}/{}", data_dir, name);
         let mut file = web::block(|| std::fs::File::create(path)).await??;
         while let Some(chunk) = field.try_next().await? {
             file = web::block(move || file.write_all(&chunk).map(|_| file)).await??;
@@ -178,7 +191,7 @@ update boards
 set icon = ? 
 where name = ?
         "#,
-        format!("/data/{}",file_name),
+        format!("/data/{}", file_name),
         board
     )
     .execute(pool)
@@ -217,13 +230,9 @@ pub async fn board_pg(
                 user: user_data,
                 board: b,
                 is_in: isin,
-                is_owner: if isin {
-                    check_if_owner(id, board, pool.get_ref())
-                        .await
-                        .unwrap_or_default()
-                } else {
-                    false
-                },
+                is_owner: check_if_owner(id, board, pool.get_ref())
+                    .await
+                    .unwrap_or_default(),
                 user_boards: get_user_boards(id, pool.get_ref()).await,
                 posts: get_n_posts(board.to_string(), pool.get_ref(), 10, offset).await,
             };
@@ -240,6 +249,13 @@ pub async fn join_board(pool: web::Data<MySqlPool>, req: HttpRequest) -> impl Re
     let board = req.match_info().get("name").ok_or("").unwrap_or_default();
     if !get_by_name(board, pool.get_ref()).await.is_ok() {
         return HttpResponse::NotFound().body("Board doesn't exist");
+    }
+
+    if check_if_owner(id, board, pool.get_ref())
+        .await
+        .unwrap_or_default()
+    {
+        return HttpResponse::Unauthorized().body("Owner can't join own board");
     }
     if check_if_joined_board(id, board, pool.get_ref())
         .await
@@ -260,16 +276,47 @@ pub async fn join_board(pool: web::Data<MySqlPool>, req: HttpRequest) -> impl Re
 pub async fn leave_board(pool: web::Data<MySqlPool>, req: HttpRequest) -> impl Responder {
     let id = req.extensions().get::<u32>().unwrap().to_owned();
     let board = req.match_info().get("name").ok_or("").unwrap_or_default();
-    if get_by_name(board, pool.get_ref()).await.is_ok()
-        && user_leave(&id, board, pool.get_ref()).await.is_ok()
+
+    if check_if_owner(id, board, pool.get_ref())
+        .await
+        .unwrap_or_default()
     {
+        return HttpResponse::Unauthorized().body("Owner can't leave");
+    }
+    if get_by_name(board, pool.get_ref()).await.is_err() {
+        return HttpResponse::NotFound().body("Board doesn't exist");
+    }
+    if user_leave(&id, board, pool.get_ref()).await.is_ok() {
         return HttpResponse::Found()
             .append_header(("location", format!("/boards/{}", board)))
             .finish();
     }
-    HttpResponse::NotFound().body("Board doesn't exist")
+    return HttpResponse::NotFound().body("Failed to leave board");
 }
 
+pub async fn delete_board(pool: web::Data<MySqlPool>, req: HttpRequest) -> impl Responder {
+    let id = req.extensions().get::<u32>().unwrap().to_owned();
+    let board = req.match_info().get("name").ok_or("").unwrap_or_default();
+
+    if !check_if_owner(id, board, pool.get_ref())
+        .await
+        .unwrap_or_default()
+    {
+        return HttpResponse::Unauthorized().body("User can not delete board");
+    }
+    if get_by_name(board, pool.get_ref()).await.is_err() {
+        return HttpResponse::NotFound().body("Board doesn't exist");
+    }
+
+    if let Err(x) = delete_board_db(board, pool.get_ref()).await {
+        return HttpResponse::NotFound()
+            .body("Failed to delete board: ".to_owned() + &x.to_string());
+    }
+
+    return HttpResponse::Found()
+        .append_header(("location", "/"))
+        .finish();
+}
 pub async fn newboard(
     form: web::Form<NewBoardData>,
     pool: web::Data<MySqlPool>,
@@ -277,9 +324,12 @@ pub async fn newboard(
 ) -> impl Responder {
     let id = req.extensions().get::<u32>().unwrap().to_owned();
     match create_board(id, form.into_inner(), pool.as_ref()).await {
-        Ok(id) => HttpResponse::Found()
-            .append_header(("location", format!("/boards/{}", id)))
-            .json(id),
+        Ok(board_id) => {
+            user_join(&id, &board_id, pool.as_ref()).await;
+            HttpResponse::Found()
+                .append_header(("location", format!("/boards/{}", board_id)))
+                .json(board_id)
+        }
         Err(e) => HttpResponse::UnprocessableEntity().body(e.to_string()),
     }
 }
@@ -294,18 +344,22 @@ pub async fn get_posts(
         .json(get_n_posts(board.to_string(), pool.get_ref(), q.limit, q.offset).await)
 }
 
-pub async fn new_icon(req: HttpRequest, mut payload: Multipart, pool: web::Data<MySqlPool>) -> impl Responder { 
+pub async fn new_icon(
+    req: HttpRequest,
+    mut payload: Multipart,
+    pool: web::Data<MySqlPool>,
+) -> impl Responder {
     let id = req.extensions().get::<u32>().unwrap().to_owned();
     let board = req.match_info().get("name").ok_or("").unwrap_or_default();
-    if let Ok(res) = check_if_owner(id, board, pool.get_ref()).await{
-        if  res {
-          if let Ok(name) = save_icon(payload, board.to_string()).await {
-                set_icon(board.to_string(),name, pool.get_ref()).await;
+    if let Ok(res) = check_if_owner(id, board, pool.get_ref()).await {
+        if res {
+            if let Ok(name) = save_icon(payload, board.to_string()).await {
+                set_icon(board.to_string(), name, pool.get_ref()).await;
             }
         }
     }
 
-      HttpResponse::SeeOther()
+    HttpResponse::SeeOther()
         .append_header(("location", format!("/boards/{}", board)))
         .finish()
 }

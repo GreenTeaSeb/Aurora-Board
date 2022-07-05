@@ -37,6 +37,7 @@
         font-family: $big-font;
         border-bottom: $border;
         padding: calc($padding/2) $padding;
+	text-decoration: none;
         align-items: center;
         .title {
 	  flex: 1;
@@ -54,7 +55,7 @@
           object-fit: cover;
           border-radius: $img-radius;
           border: 0.25rem solid $bg;
-	  background-color: $pfp;
+	  background-color: #282828;
           // box-shadow: 0 0 20px black;
         }
       }

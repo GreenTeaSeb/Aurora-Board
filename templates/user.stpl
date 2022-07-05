@@ -15,6 +15,9 @@
 	</aside>
 	<div id="posts">
 		<div class="page">
+		<% for post in posts { %>
+		<% include!("./tiletemplatehome.stpl");%>
+		    <%};%>
 		</div>
 		<% include!("./loading.stpl");%>
        </div>

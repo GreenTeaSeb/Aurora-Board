@@ -1,4 +1,4 @@
-use super::user::check_if_joined_board;
+use super::user::{check_if_joined_board, check_if_owner};
 use actix_web::{self, web, HttpMessage, HttpRequest, HttpResponse, Responder};
 use anyhow::Result;
 use chrono::Utc;

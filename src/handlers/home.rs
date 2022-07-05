@@ -36,7 +36,14 @@ struct BoardEntry {
 }
 
 #[derive(Deserialize, Debug)]
+enum Filter {
+    Feed,
+    All,
+}
+
+#[derive(Deserialize, Debug)]
 pub struct GetPostsQuery {
+    filter: Option<Filter>,
     page: Option<u32>,
 }
 
@@ -77,6 +84,21 @@ offset ?;
     .unwrap_or_default()
 }
 
+pub async fn get_all_posts(pool: &MySqlPool, limit: u32, offset: u32) -> Vec<BoardPost> {
+    sqlx::query_as!(
+        BoardPost,
+        r#"
+SELECT posts.id ,posts.created_at ,posts.poster_id ,( select name from boards where id = posts.board_id) as board_name, ( select icon from boards where id = posts.board_id) as board_icon ,posts.title ,posts.`text` FROM posts
+ORDER BY posts.created_at DESC
+limit ?
+offset ?;
+"#, limit, offset * limit
+    )
+    .fetch_all(pool)
+    .await
+    .unwrap_or_default()
+}
+
 pub async fn home(
     id: Identity,
     pool: web::Data<MySqlPool>,
@@ -93,7 +115,14 @@ pub async fn home(
         user: user_res,
         top_boards: top,
         user_boards: get_user_boards(id_int, pool.get_ref()).await,
-        posts: get_member_posts(&id_int, pool.get_ref(), 10, q.page.unwrap_or_default()).await,
+        // posts: get_member_posts(&id_int, pool.get_ref(), 10, q.page.unwrap_or_default()).await,
+        // posts: get_all_posts(pool.get_ref(), 10, q.page.unwrap_or_default()).await,
+        posts: match q.filter.as_ref().unwrap_or(&Filter::All) {
+            Filter::Feed => {
+                get_member_posts(&id_int, pool.get_ref(), 10, q.page.unwrap_or_default()).await
+            }
+            Filter::All => get_all_posts(pool.get_ref(), 10, q.page.unwrap_or_default()).await,
+        },
     };
     HttpResponse::Ok().body(temp.render_once().unwrap())
 }

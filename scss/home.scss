@@ -143,12 +143,15 @@ body {
               object-fit: cover;
               border-radius: $img-radius;
               border: 0.25rem solid $bg;
-	      background-color: $pfp;
+	      background-color: #282828;
             }
           }
         }
 
         #options {
+	    label[for=delete]{
+		color: #dd5353
+	    }
           a {
             justify-content: center;
           }

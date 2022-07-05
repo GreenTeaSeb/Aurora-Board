@@ -6,7 +6,7 @@ $primary: #4670c2;
 $secondary: #6cdbc3;
 $border: 1px solid $bg;
 
-$pfp: #86d28f;
+$pfp: #282828;
 $margin: 2rem;
 $padding: 1rem;
 $navbar-height: 2.5rem;
@@ -142,6 +142,7 @@ $shadow: 0 0 10px black;
         border-radius: $img-radius;
         border: 0.25rem solid $bg;
         box-sizing: border-box;
+	background-color: $pfp;
       }
       .name {
         flex: 1;

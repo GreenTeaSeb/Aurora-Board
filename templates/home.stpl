@@ -17,13 +17,7 @@
 	<div id="posts">
 		<div class="page">
   		<% for post in posts { %>
-		    <div class="tile">	
-			<a class="src" href=  <%= format!("\"/boards/{}\"", post.board_name.clone().unwrap_or_default() ) %> >
-			    <img src= <%= format!("\"{}\"", post.board_icon.clone().unwrap_or_default() ) %> alt="">
-			    <%= post.board_name.unwrap_or_default() %>
-			</a>
-		<% include!("./tiletemplate.stpl");%>
-		    </div>
+		<% include!("./tiletemplatehome.stpl");%>
 		    <%};%>
 		</div>
 		<% include!("./loading.stpl");%>

@@ -48,6 +48,7 @@ async fn main() -> Result<()> {
                             .wrap(handlers::middleware::LoginAuth)
                             .route("join", web::post().to(handlers::board::join_board))
                             .route("leave", web::post().to(handlers::board::leave_board))
+                            .route("delete", web::post().to(handlers::board::delete_board))
                             .route("", web::post().to(handlers::post::newpost))
                             .route("icon", web::post().to(handlers::board::new_icon)),
                     )

@@ -1,9 +1,9 @@
+use super::home::BoardPost;
 use actix_identity::Identity;
 use actix_web::{web, HttpRequest, HttpResponse};
 use anyhow::Result;
 use sailfish::TemplateOnce;
 use sqlx::MySqlPool;
-use super::home::BoardPost;
 
 #[derive(Debug)]
 pub struct User {
@@ -24,7 +24,6 @@ struct UserTemplate {
     user_guest: User,
     user_boards: Vec<UserBoards>,
     posts: Vec<BoardPost>,
-
 }
 
 pub async fn get_by_id(id: &u32, pool: &MySqlPool) -> Result<User> {
@@ -58,7 +57,7 @@ pub async fn user_page(id: Identity, req: HttpRequest, pool: web::Data<MySqlPool
                 user_guest: u,
                 user_boards: get_user_boards(id_int, pool.get_ref()).await,
                 // posts: get_member_posts(&id_int, pool.get_ref(), 10, q.page.unwrap_or_default()).await,
-                posts: Vec::default()
+                posts: get_user_posts(id_guest_int,pool.as_ref(),10,0).await,
             };
 
             HttpResponse::Ok().body(temp.render_once().unwrap())
@@ -108,6 +107,22 @@ inner join members on
 members.board_id = boards.id and user_id = ?
 "#,
         id
+    )
+    .fetch_all(pool)
+    .await
+    .unwrap_or_default()
+}
+
+async fn get_user_posts(id: u32 , pool: &MySqlPool, limit: u32, offset: u32) -> Vec<BoardPost> {
+    sqlx::query_as!(
+        BoardPost,
+        r#"
+select posts.id ,posts.created_at ,posts.poster_id ,( select name from boards where id = posts.board_id) as board_name, ( select icon from boards where id = posts.board_id) as board_icon ,posts.title ,posts.`text` from posts
+where posts.poster_id = ?
+order by posts.created_at desc
+limit ?
+offset ?;
+"#, id, limit, offset * limit
     )
     .fetch_all(pool)
     .await
