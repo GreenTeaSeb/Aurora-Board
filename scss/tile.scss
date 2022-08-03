@@ -85,6 +85,9 @@
       flex-direction: column;
       justify-content: center;
       overflow: clip;
+      input{
+	display: none;
+      }
       svg {
         padding: $padding;
         flex: 1;

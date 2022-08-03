@@ -41,7 +41,7 @@ struct BoardTemplate {
     is_in: bool,
     is_owner: bool,
     user_boards: Vec<UserBoards>,
-    posts: Vec<Post>,
+    posts: Vec<BoardPost>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -54,6 +54,17 @@ pub struct GetPostsQuery {
     limit: u32,
     offset: u32,
 }
+
+#[derive(Serialize, FromRow, Debug)]
+pub struct BoardPost {
+    pub id: u32,
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    pub poster_id: u32,
+    pub board_id: u32,
+    pub title: String,
+    pub text: String,
+}
+
 // LOGIC FUNCTIONS
 
 async fn create_board(id: u32, form: NewBoardData, pool: &MySqlPool) -> Result<String> {
@@ -98,7 +109,11 @@ pub async fn get_by_name(name: &str, pool: &MySqlPool) -> Result<Board> {
     .await?)
 }
 
-async fn user_join(id: &u32, board: &str, pool: &MySqlPool) -> Result<()> {
+async fn user_join(
+    id: &u32,
+    board: &str,
+    pool: &MySqlPool,
+) -> Result<sqlx::mysql::MySqlQueryResult, sqlx::Error> {
     sqlx::query!(
         r#"
 	INSERT INTO members (user_id, board_id, admin)
@@ -109,8 +124,7 @@ VALUES (?, (select id from boards where name = ? ) , ?)
         false
     )
     .execute(pool)
-    .await?;
-    Ok(())
+    .await
 }
 
 async fn user_leave(id: &u32, board: &str, pool: &MySqlPool) -> Result<()> {
@@ -144,11 +158,11 @@ pub async fn get_n_posts(
     pool: &MySqlPool,
     limit: u32,
     offset: u32,
-) -> Vec<Post> {
+) -> Vec<BoardPost> {
     sqlx::query_as!(
-        Post,
+        BoardPost,
         r#"
-select * from posts
+select id,created_at,poster_id,board_id,title,text from posts
 where board_id = (select id from boards where name = ?)
 order by created_at desc
 limit ?
@@ -169,7 +183,7 @@ async fn save_icon(mut payload: Multipart, board: String) -> Result<String> {
             .content_disposition()
             .get_filename()
             .context("Missing file name!")?
-            .split(".")
+            .split('.')
             .last()
             .context("Missing file type")?;
         let name = format!("{}.{}", board, extension);
@@ -184,7 +198,11 @@ async fn save_icon(mut payload: Multipart, board: String) -> Result<String> {
     anyhow::bail!("No  payload");
 }
 
-async fn set_icon(board: String, file_name: String, pool: &MySqlPool) -> Result<()> {
+async fn set_icon(
+    board: String,
+    file_name: String,
+    pool: &MySqlPool,
+) -> Result<sqlx::mysql::MySqlQueryResult, sqlx::Error> {
     sqlx::query!(
         r#"
 update boards
@@ -195,8 +213,7 @@ where name = ?
         board
     )
     .execute(pool)
-    .await?;
-    Ok(())
+    .await
 }
 
 // FRONTEND
@@ -247,7 +264,7 @@ pub async fn board_pg(
 pub async fn join_board(pool: web::Data<MySqlPool>, req: HttpRequest) -> impl Responder {
     let id = req.extensions().get::<u32>().unwrap().to_owned();
     let board = req.match_info().get("name").ok_or("").unwrap_or_default();
-    if !get_by_name(board, pool.get_ref()).await.is_ok() {
+    if get_by_name(board, pool.get_ref()).await.is_err() {
         return HttpResponse::NotFound().body("Board doesn't exist");
     }
 
@@ -265,7 +282,7 @@ pub async fn join_board(pool: web::Data<MySqlPool>, req: HttpRequest) -> impl Re
             .append_header(("location", format!("/boards/{}", board)))
             .body("User is already in server");
     }
-    if !user_join(&id, board, pool.get_ref()).await.is_ok() {
+    if user_join(&id, board, pool.get_ref()).await.is_err() {
         return HttpResponse::InternalServerError().body("Failed to join");
     }
     return HttpResponse::Found()
@@ -291,7 +308,7 @@ pub async fn leave_board(pool: web::Data<MySqlPool>, req: HttpRequest) -> impl R
             .append_header(("location", format!("/boards/{}", board)))
             .finish();
     }
-    return HttpResponse::NotFound().body("Failed to leave board");
+    HttpResponse::InternalServerError().body("Failed to leave board")
 }
 
 pub async fn delete_board(pool: web::Data<MySqlPool>, req: HttpRequest) -> impl Responder {
@@ -325,12 +342,14 @@ pub async fn newboard(
     let id = req.extensions().get::<u32>().unwrap().to_owned();
     match create_board(id, form.into_inner(), pool.as_ref()).await {
         Ok(board_id) => {
-            user_join(&id, &board_id, pool.as_ref()).await;
+            if let Err(err) = user_join(&id, &board_id, pool.as_ref()).await {
+                return HttpResponse::InternalServerError().body(err.to_string());
+            }
             HttpResponse::Found()
                 .append_header(("location", format!("/boards/{}", board_id)))
                 .json(board_id)
         }
-        Err(e) => HttpResponse::UnprocessableEntity().body(e.to_string()),
+        Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
     }
 }
 
@@ -346,7 +365,7 @@ pub async fn get_posts(
 
 pub async fn new_icon(
     req: HttpRequest,
-    mut payload: Multipart,
+    payload: Multipart,
     pool: web::Data<MySqlPool>,
 ) -> impl Responder {
     let id = req.extensions().get::<u32>().unwrap().to_owned();
@@ -354,7 +373,9 @@ pub async fn new_icon(
     if let Ok(res) = check_if_owner(id, board, pool.get_ref()).await {
         if res {
             if let Ok(name) = save_icon(payload, board.to_string()).await {
-                set_icon(board.to_string(), name, pool.get_ref()).await;
+                if let Err(err) = set_icon(board.to_string(), name, pool.get_ref()).await {
+                    return HttpResponse::InternalServerError().body(err.to_string());
+                }
             }
         }
     }

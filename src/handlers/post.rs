@@ -1,4 +1,4 @@
-use super::user::{check_if_joined_board, check_if_owner};
+use super::user::check_if_joined_board;
 use actix_web::{self, web, HttpMessage, HttpRequest, HttpResponse, Responder};
 use anyhow::Result;
 use chrono::Utc;
@@ -41,6 +41,43 @@ values(?, (select id from boards where name = ?) ,?,?);
     Ok(last_id)
 }
 
+async fn new_like(
+    id: u32,
+    post_id: u32,
+    is_like: bool,
+    pool: &MySqlPool,
+) -> Result<sqlx::mysql::MySqlQueryResult, sqlx::Error> {
+    sqlx::query!(
+        r#"
+insert into likes (user_id,post_id,is_like)
+values (?,?,?)
+on duplicate key update  is_like = ?
+        "#,
+        id,
+        post_id,
+        is_like,
+        is_like
+    )
+    .execute(pool)
+    .await
+}
+
+pub async fn is_liked(id: u32, post_id: u32, pool: &MySqlPool) -> Option<bool> {
+    if let Ok(val) = sqlx::query!(
+        r#"select is_like from likes
+where user_id = ? and post_id = ?;"#,
+        id,
+        post_id
+    )
+    .fetch_one(pool)
+    .await
+    {
+        Some(val.is_like != 0)
+    } else {
+        None
+    }
+}
+
 //API
 pub async fn newpost(
     form: web::Form<NewPostdata>,
@@ -68,11 +105,40 @@ pub fn time_msg(old: chrono::DateTime<Utc>) -> String {
     let diff = new.signed_duration_since(old);
     let mins = diff.num_minutes();
     match mins {
-        0 => return String::from("a few seconds ago"),
-        1 => return format!("{} minute ago", mins),
-        2..=59 => return format!("{} minutes ago", mins),
-        60..=119 => return format!("{} hour ago", diff.num_hours()),
-        120..=1439 => return format!("{} hours ago", diff.num_hours()),
-        _ => return old.format("%x").to_string(),
+        0 => String::from("a few seconds ago"),
+        1 => format!("{} minute ago", mins),
+        2..=59 => format!("{} minutes ago", mins),
+        60..=119 => format!("{} hour ago", diff.num_hours()),
+        120..=1439 => format!("{} hours ago", diff.num_hours()),
+        _ => old.format("%x").to_string(),
+    }
+}
+
+pub async fn like_post(pool: web::Data<MySqlPool>, req: HttpRequest) -> impl Responder {
+    let id = req.extensions().get::<u32>().unwrap().to_owned();
+    let post_id = match req.match_info().get("post") {
+        Some(p) => p.to_string().parse::<u32>(),
+        None => return HttpResponse::UnprocessableEntity().finish(),
+    };
+    match post_id {
+        Ok(postid) => match new_like(id, postid, true, pool.as_ref()).await {
+            Ok(_) => HttpResponse::Ok().finish(),
+            Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
+        },
+        Err(e) => return HttpResponse::UnprocessableEntity().body(e.to_string()),
+    }
+}
+pub async fn dislike_post(pool: web::Data<MySqlPool>, req: HttpRequest) -> impl Responder {
+    let id = req.extensions().get::<u32>().unwrap().to_owned();
+    let post_id = match req.match_info().get("post") {
+        Some(p) => p.to_string().parse::<u32>(),
+        None => return HttpResponse::UnprocessableEntity().finish(),
+    };
+    match post_id {
+        Ok(postid) => match new_like(id, postid, false, pool.as_ref()).await {
+            Ok(_) => HttpResponse::Ok().finish(),
+            Err(err) => HttpResponse::InternalServerError().body(err.to_string()),
+        },
+        Err(e) => return HttpResponse::UnprocessableEntity().body(e.to_string()),
     }
 }

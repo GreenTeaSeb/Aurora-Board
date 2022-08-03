@@ -57,7 +57,7 @@ pub async fn user_page(id: Identity, req: HttpRequest, pool: web::Data<MySqlPool
                 user_guest: u,
                 user_boards: get_user_boards(id_int, pool.get_ref()).await,
                 // posts: get_member_posts(&id_int, pool.get_ref(), 10, q.page.unwrap_or_default()).await,
-                posts: get_user_posts(id_guest_int,pool.as_ref(),10,0).await,
+                posts: get_user_posts(id_guest_int, pool.as_ref(), 10, 0).await,
             };
 
             HttpResponse::Ok().body(temp.render_once().unwrap())
@@ -92,6 +92,7 @@ SELECT IF(boards.owner_id = ?, true,false) as is_owner FROM boards WHERE boards.
     .fetch_one(pool)
     .await?
     .is_owner
+    .unwrap_or_default()
         != 0)
 }
 pub struct UserBoards {
@@ -113,7 +114,7 @@ members.board_id = boards.id and user_id = ?
     .unwrap_or_default()
 }
 
-async fn get_user_posts(id: u32 , pool: &MySqlPool, limit: u32, offset: u32) -> Vec<BoardPost> {
+async fn get_user_posts(id: u32, pool: &MySqlPool, limit: u32, offset: u32) -> Vec<BoardPost> {
     sqlx::query_as!(
         BoardPost,
         r#"

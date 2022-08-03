@@ -59,6 +59,12 @@ async fn main() -> Result<()> {
                             .route("", web::get().to(handlers::board::newboard_pg)),
                     ),
             )
+            .service(
+                web::scope("/posts/{post}")
+                    .wrap(handlers::middleware::LoginAuth)
+                    .route("like", web::post().to(handlers::post::like_post))
+                    .route("dislike", web::post().to(handlers::post::dislike_post)),
+            )
             .service(fs::Files::new("/data", "./data/").show_files_listing())
             .service(fs::Files::new("", "./static/").show_files_listing())
     })

@@ -115,8 +115,6 @@ pub async fn home(
         user: user_res,
         top_boards: top,
         user_boards: get_user_boards(id_int, pool.get_ref()).await,
-        // posts: get_member_posts(&id_int, pool.get_ref(), 10, q.page.unwrap_or_default()).await,
-        // posts: get_all_posts(pool.get_ref(), 10, q.page.unwrap_or_default()).await,
         posts: match q.filter.as_ref().unwrap_or(&Filter::All) {
             Filter::Feed => {
                 get_member_posts(&id_int, pool.get_ref(), 10, q.page.unwrap_or_default()).await
