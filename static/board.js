@@ -23,6 +23,8 @@ const newpost_button = document.getElementById("newpost-button");
 const newpost_modal = document.getElementById("newpost-modal");
 const boardimg_modal = document.getElementById("boardimg-modal");
 const boardimg_button = document.getElementById("boardimg-edit");
+const edit_modal = document.getElementById("edit-modal");
+const edit_button = document.getElementById("edit-button");
 const posts = document.getElementById("posts");
 const posts_loading = posts.querySelector(".loading");
 const main = document.getElementById("content");
@@ -58,6 +60,10 @@ await new Promise(r => setTimeout(r, 2000));
   }
 };
 
+const close_modal = (m) => {
+    m.closest('.modal').close();
+}
+
 newpost_button.addEventListener("click", () => {
   newpost_modal.showModal();
 });
@@ -65,5 +71,9 @@ boardimg_button.addEventListener("click", () => {
   boardimg_modal.showModal();
 });
 
+edit_button.addEventListener("click", () => {
+    edit_modal.showModal();
+});
 
 main.addEventListener("scroll", get_posts);
+

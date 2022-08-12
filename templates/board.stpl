@@ -8,32 +8,71 @@
       </title>
       <link rel="stylesheet" href="/css/home.css" />
       <link rel="stylesheet" href="/css/newpost.css" />
-      <script type="module" src="/newpost.js"></script>
+      <script  src="/board.js" defer></script>
+      <script  src="/like.js"></script>
+      <script  src="/sidebars.js" defer></script>
    </head>
    <body>
 	<dialog  id="newpost-modal" class="modal">
 	    <form action="" method="post" class="panel">    
-	    <div id="inputs" class="section">  	
-		<label>	
-			<input type="text" name="title" id="title" placeholder="title" required>
-		</label>
-		<label class="textarea">	
-			<textarea name="text" id="text" rows="8" cols="40" placeholder="text" required></textarea>
-		</label>
-			<button id="submit" type="submit" class="button main-button">Create</button>
+		<div class="title section">New Post</div>
+		<div class="inputs section">  	
+		    <label>
+			<input type="text" name="title"  maxlength="255" placeholder="title" required>
+		    </label>
+		    <label class="textarea">	
+			<textarea name="text" id="text" rows="8" cols="40" maxlength="20000" placeholder="text" required></textarea>
+		    </label>
+		</div>
+		<div class="buttons section">
+		    <button type="reset" class="cancel button hover" onclick="close_modal(this)">Cancel</button>
+		    <button type="submit" class="submit button main-button">Post</button>
 		</div>
 	    </form>	
 	</dialog>
+
 	<dialog  id="boardimg-modal" class="modal">
 	    <form action=<%=format!("{}/icon", board.name) %> method="post" enctype="multipart/form-data" class="panel">    
-	    <div id="inputs" class="section">  	
+	    <div class="inputs section">  	
 		<label id="file-upload">	
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
 			<input type="file" name="icon" id="icon" accept="image/png, image/jpeg, image/gif" required>
 		</label>
-		<button id="submit" type="submit" class="button main-button">Upload</button>
+		<button type="submit" class="submit button main-button">Upload</button>
+		</div>
+	    </form>
+	</dialog>
+
+	<dialog  id="edit-modal" class="modal">
+	    <form action=<%= format!("\"{}/edit\"", board.name) %> method="post" class="">    
+	       <div class="title section">Edit Board</div>
+		<div class="inputs section">  	
+		    <label>	
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+			<input type="text" name="name"  maxlength="255" placeholder="title" required>
+		    </label>
+		    <label class="textarea">	
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-info"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+			<textarea name="desc"  rows="5" cols="40" maxlength="255" placeholder="description" required></textarea>
+		    </label>
+		</div>
+		<div class="options section">
+		    <label>
+			private
+			<input type="checkbox" name="private" value="0">
+		    </label>	
+		</div>
+		<div class="buttons section">
+		    <button type="reset" class="cancel button hover" onclick="close_modal(this)">Cancel</button>
+		    <button type="submit" class="submit button main-button">Update</button>
 		</div>
 	    </form>	
+			<!-- 	    <form class="panel" action = <%=format!("{}/delete", board.name) %> method = "post" > -->
+			<!-- 		    <label for="delete"> -->
+			<!--     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg> -->
+			<!-- <input name="delete" type="submit" value="delete" class="button" id="delete" /> -->
+			<!-- 		    </label> -->
+			<!-- 	    </form> -->
 	</dialog>
 
          <% include!("./navbar.stpl"); %>
@@ -64,13 +103,8 @@
 			<p> <%= board.description %> </p>
 		   </div>
 		   <div id="options" class="section">
-		      <% if is_owner { %>
-			    <form action=<%=format!("{}/delete", board.name) %> method = "post" class="button hover" >
-			       <label for="delete">
-			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-			    <input name="delete" type="submit" value="delete" class="button" id="delete" />
-			    </label>
-			  </form>
+		      <% if is_owner { %>	
+			<div id="edit-button" class="button hover" ><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>edit</div>
 		      <% } else if !is_in { %>
 			  <form action=<%=format!("{}/join", board.name) %> method = "post" class="button hover" >
 			       <label for="join">

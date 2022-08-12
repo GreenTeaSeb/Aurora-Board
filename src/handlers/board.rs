@@ -1,4 +1,3 @@
-use super::post::Post;
 use super::user::{check_if_joined_board, check_if_owner, get_user_boards, UserBoards};
 use crate::handlers::user::{self, User};
 use actix_files as fs;
@@ -25,12 +24,20 @@ pub struct Board {
     description: String,
     created_at: chrono::DateTime<chrono::Utc>,
     icon: String,
+    private: i8,
 }
 
 #[derive(Deserialize)]
 pub struct NewBoardData {
     name: String,
     desc: String,
+}
+
+#[derive(Deserialize)]
+pub struct BoardData {
+    name: String,
+    desc: String,
+    private: Option<i8>,
 }
 
 #[derive(TemplateOnce)]
@@ -63,6 +70,8 @@ pub struct BoardPost {
     pub board_id: u32,
     pub title: String,
     pub text: String,
+    pub status: Option<i8>,
+    pub pfp: String,
 }
 
 // LOGIC FUNCTIONS
@@ -153,8 +162,26 @@ DELETE FROM boards where name = ? ;
     Ok(())
 }
 
+async fn edit_board_db(board: &str, form: BoardData, pool: &MySqlPool) -> Result<String> {
+    sqlx::query!(
+        r#"
+        UPDATE boards
+        SET name = ? , description = ? , private = ?
+        WHERE boards.name = ?
+	"#,
+        form.name,
+        form.desc,
+        form.private.is_some(),
+        board
+    )
+    .execute(pool)
+    .await?;
+    Ok(form.name)
+}
+
 pub async fn get_n_posts(
     board_name: String,
+    id: u32,
     pool: &MySqlPool,
     limit: u32,
     offset: u32,
@@ -162,12 +189,15 @@ pub async fn get_n_posts(
     sqlx::query_as!(
         BoardPost,
         r#"
-select id,created_at,poster_id,board_id,title,text from posts
+select posts.id,posts.created_at,poster_id,board_id,title,text, likes.is_like as status, users.pfp from posts
+left join likes on likes.post_id = posts.id and likes.user_id = ?
+inner join users on users.id = poster_id
 where board_id = (select id from boards where name = ?)
 order by created_at desc
 limit ?
 offset ?
 "#,
+        id,
         board_name,
         limit,
         offset * limit
@@ -189,6 +219,7 @@ async fn save_icon(mut payload: Multipart, board: String) -> Result<String> {
         let name = format!("{}.{}", board, extension);
         let data_dir = env::var("DATA")?;
         let path = format!("{}/{}", data_dir, name);
+        // delete existing
         let mut file = web::block(|| std::fs::File::create(path)).await??;
         while let Some(chunk) = field.try_next().await? {
             file = web::block(move || file.write_all(&chunk).map(|_| file)).await??;
@@ -251,7 +282,7 @@ pub async fn board_pg(
                     .await
                     .unwrap_or_default(),
                 user_boards: get_user_boards(id, pool.get_ref()).await,
-                posts: get_n_posts(board.to_string(), pool.get_ref(), 10, offset).await,
+                posts: get_n_posts(board.to_string(), id, pool.get_ref(), 10, offset).await,
             };
             HttpResponse::Found().body(temp.render_once().unwrap())
         }
@@ -334,6 +365,7 @@ pub async fn delete_board(pool: web::Data<MySqlPool>, req: HttpRequest) -> impl 
         .append_header(("location", "/"))
         .finish();
 }
+
 pub async fn newboard(
     form: web::Form<NewBoardData>,
     pool: web::Data<MySqlPool>,
@@ -353,6 +385,31 @@ pub async fn newboard(
     }
 }
 
+pub async fn edit_board(
+    form: web::Form<BoardData>,
+    pool: web::Data<MySqlPool>,
+    req: HttpRequest,
+) -> impl Responder {
+    let id = req.extensions().get::<u32>().unwrap().to_owned();
+    let board = req.match_info().get("name").ok_or("").unwrap_or_default();
+
+    if !check_if_owner(id, board, pool.get_ref())
+        .await
+        .unwrap_or_default()
+    {
+        return HttpResponse::Unauthorized().body("User can not delete board");
+    }
+    if get_by_name(board, pool.get_ref()).await.is_err() {
+        return HttpResponse::NotFound().body("Board doesn't exist");
+    }
+
+    if let Err(x) = edit_board_db(board, form.into_inner(), pool.get_ref()).await {
+        return HttpResponse::NotFound().body("Failed to edit board: ".to_owned() + &x.to_string());
+    }
+
+    return HttpResponse::Ok().finish();
+}
+
 pub async fn get_posts(
     req: HttpRequest,
     pool: web::Data<MySqlPool>,
@@ -360,7 +417,7 @@ pub async fn get_posts(
 ) -> impl Responder {
     let board = req.match_info().get("name").ok_or("").unwrap_or_default();
     HttpResponse::Found()
-        .json(get_n_posts(board.to_string(), pool.get_ref(), q.limit, q.offset).await)
+        .json(get_n_posts(board.to_string(), 0, pool.get_ref(), q.limit, q.offset).await)
 }
 
 pub async fn new_icon(

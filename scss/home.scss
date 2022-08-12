@@ -15,18 +15,25 @@
 }
 
 body {
- .modal {
+  .modal {
     @include form;
     background: none;
     border: 0;
     outline: 0;
     padding: 0;
-    #file-upload{
-	input{
-	    &::file-selector-button{
-	    display: none;
-	    }
-	}
+    #file-upload {
+      input {
+        &::file-selector-button {
+          display: none;
+        }
+      }
+    }
+    .buttons {
+      display: flex;
+
+      .submit {
+        margin-left: auto;
+      }
     }
   }
   main {
@@ -88,10 +95,10 @@ body {
       }
     }
     #sidebar-left {
-      .section:first-child{
-	  li{
-	      padding: $padding;
-	  }
+      .section:first-child {
+        li {
+          padding: $padding;
+        }
       }
     }
     .sidebar {
@@ -126,32 +133,31 @@ body {
           text-align: center;
           padding: $padding;
           #board-img {
-	    position: relative;
-	    .edit{
-		position: absolute;
-		right: -0.5rem;	
-		top: -0.5rem;	
-		transition: 0.1s;
-		  &:hover {
-		    color: $text;
-		}
-
-	    }
+            position: relative;
+            .edit {
+              position: absolute;
+              right: -0.5rem;
+              top: -0.5rem;
+              transition: 0.1s;
+              &:hover {
+                color: $text;
+              }
+            }
             #icon {
               height: 5rem;
               width: 5rem;
               object-fit: cover;
               border-radius: $img-radius;
               border: 0.25rem solid $bg;
-	      background-color: #282828;
+              background-color: #282828;
             }
           }
         }
 
         #options {
-	    label[for=delete]{
-		color: #dd5353
-	    }
+          label[for="delete"] {
+            color: #dd5353;
+          }
           a {
             justify-content: center;
           }
@@ -184,9 +190,52 @@ body {
       }
     }
     @include for_breakpoint(mobile tablet) {
-      flex-direction: column-reverse;
-      gap: $margin;
+      overflow-x: clip;
+      gap: $padding;
+
+      .sidebar {
+        top: 0;
+        position: sticky;
+        transition: 0.3s;
+        &#sidebar-left {
+          visibility: hidden;
+          margin-left: -100%;
+        }
+        &#sidebar-right {
+          visibility: hidden;
+          margin-right: -100%;
+        }
+      }
+      &.left #sidebar-left{
+          visibility: visible;
+      }
+      &.right #sidebar-right{
+          visibility: visible;
+      }
+      #posts {
+        margin: 0;
+      }
+      // flex-direction: column-reverse;
+      // gap: $margin;
     }
+  }
+}
+
+@keyframes to-left {
+  from {
+    margin-left: 0;
+  }
+  to {
+    margin-left: -100%;
+  }
+}
+
+@keyframes to-right {
+  from {
+    margin-right: -100%;
+  }
+  to {
+    margin-left: 0%;
   }
 }
 

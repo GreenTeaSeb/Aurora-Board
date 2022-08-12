@@ -95,6 +95,7 @@ SELECT IF(boards.owner_id = ?, true,false) as is_owner FROM boards WHERE boards.
     .unwrap_or_default()
         != 0)
 }
+
 pub struct UserBoards {
     pub name: String,
     pub icon: String,
@@ -118,12 +119,13 @@ async fn get_user_posts(id: u32, pool: &MySqlPool, limit: u32, offset: u32) -> V
     sqlx::query_as!(
         BoardPost,
         r#"
-select posts.id ,posts.created_at ,posts.poster_id ,( select name from boards where id = posts.board_id) as board_name, ( select icon from boards where id = posts.board_id) as board_icon ,posts.title ,posts.`text` from posts
+select posts.id ,posts.created_at ,posts.poster_id ,( select name from boards where id = posts.board_id) as board_name, ( select icon from boards where id = posts.board_id) as board_icon ,posts.title ,posts.`text`, likes.is_like as status from posts
+left join likes on likes.post_id = id and likes.user_id = ?
 where posts.poster_id = ?
 order by posts.created_at desc
 limit ?
 offset ?;
-"#, id, limit, offset * limit
+"#,id, id, limit, offset * limit
     )
     .fetch_all(pool)
     .await

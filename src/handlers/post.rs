@@ -1,4 +1,5 @@
 use super::user::check_if_joined_board;
+use super::utils::sanitize_html;
 use actix_web::{self, web, HttpMessage, HttpRequest, HttpResponse, Responder};
 use anyhow::Result;
 use chrono::Utc;
@@ -23,7 +24,12 @@ pub struct Post {
 
 //LOGIC
 
-async fn new_post(id: u32, board_name: String, form: NewPostdata, pool: &MySqlPool) -> Result<u32> {
+async fn new_post(
+    id: u32,
+    board_name: String,
+    form: &NewPostdata,
+    pool: &MySqlPool,
+) -> Result<u32> {
     let new = sqlx::query_as!(
         Post,
         r#"
@@ -33,7 +39,7 @@ values(?, (select id from boards where name = ?) ,?,?);
         id,
         board_name,
         form.title,
-        form.text
+        sanitize_html(&form.text)
     )
     .execute(pool)
     .await?;
@@ -92,7 +98,7 @@ pub async fn newpost(
     {
         return HttpResponse::Unauthorized().body("User not in board");
     }
-    match new_post(id, board.to_string(), form.into_inner(), pool.as_ref()).await {
+    match new_post(id, board.to_string(), &form.into_inner(), pool.as_ref()).await {
         Ok(newid) => HttpResponse::Found()
             .append_header(("location", format!("/boards/{}", board)))
             .json(newid),
@@ -142,3 +148,5 @@ pub async fn dislike_post(pool: web::Data<MySqlPool>, req: HttpRequest) -> impl 
         Err(e) => return HttpResponse::UnprocessableEntity().body(e.to_string()),
     }
 }
+
+//FRONTEND

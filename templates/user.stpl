@@ -6,6 +6,7 @@
     <title>Aurora Board - <%=user_guest.username%></title>
      <link rel="stylesheet" href="/css/home.css" />
       <script type="module" src="/home.js"></script>
+      <script src="/like.js"></script>
      </head>
   <body>
      <% include!("./navbar.stpl"); %>

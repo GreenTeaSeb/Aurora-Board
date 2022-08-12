@@ -5,7 +5,9 @@
 	<!-- custom -->
     <title>Aurora Board</title>
     <link rel="stylesheet" href="/css/home.css" />
-      <script type="module" src="/home.js"></script>
+      <script  src="/home.js"></script>
+      <script src="/like.js" defer></script>
+      <script  src="/sidebars.js" defer></script>
      </head>
   <body>
      <% include!("./navbar.stpl"); %>
@@ -33,7 +35,7 @@
 	   <ol>
 	     <% for board in &top_boards { %>
 	     <li>
-	       <a  href= <%= format!("\"/boards/{}\"",board.name) %>class = "entry">
+	       <a  href= <%- format!("\"/boards/{}\"",board.name) %>class = "entry">
 		   <img src= <%= board.icon %> alt="">
 		 <p class="name" > <%= board.name %> </p>
 		 <p class="count"> <%= board.member_count %> </p>

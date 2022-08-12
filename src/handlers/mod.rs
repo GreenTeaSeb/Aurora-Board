@@ -4,3 +4,4 @@ pub mod login;
 pub mod middleware;
 pub mod post;
 pub mod user;
+pub mod utils;

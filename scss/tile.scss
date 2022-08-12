@@ -37,17 +37,17 @@
         font-family: $big-font;
         border-bottom: $border;
         padding: calc($padding/2) $padding;
-	text-decoration: none;
+        text-decoration: none;
         align-items: center;
         .title {
-	  flex: 1;
+          flex: 1;
           overflow: hidden;
           text-overflow: ellipsis;
-	  white-space: nowrap;
+          white-space: nowrap;
         }
         .time {
           color: $secondary-text;
-	  margin-left: auto;
+          margin-left: auto;
         }
         .pfp {
           height: 3rem;
@@ -55,7 +55,7 @@
           object-fit: cover;
           border-radius: $img-radius;
           border: 0.25rem solid $bg;
-	  background-color: #282828;
+          background-color: #282828;
           // box-shadow: 0 0 20px black;
         }
       }
@@ -85,14 +85,28 @@
       flex-direction: column;
       justify-content: center;
       overflow: clip;
-      input{
-	display: none;
+      &.liked .like {
+        color: desaturate(darken($green,10),20);
+        fill: $green;
+      }
+      &.disliked .dislike {
+        color: desaturate(darken($red,10),20);
+        fill: $red;
+      }
+      form{
+	height: 100%;
+	display: flex;
+	align-items: center;
+      }
+      input {
+        display: none;
       }
       svg {
         padding: $padding;
         flex: 1;
         height: 2rem;
         color: $secondary-text;
+	transition: 0.1s;
       }
     }
     &:not(:last-child) {

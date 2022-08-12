@@ -25,6 +25,10 @@
       font-size: x-large;
       text-decoration: none;
     }
+    @include for_breakpoint(mobile) {
+      display: none;
+    }
+
   }
   #search {
     background-color: $bg;
@@ -100,8 +104,14 @@
 	  box-sizing: border-box;
       }
     }
-    .button{
+    #logout{
+	text-decoration: none;
+	color: $red;
+    }
+    #signup-btn{
+	background: $primary;
 	border-radius: $img-radius;
+	box-sizing: border-box
     }
     @include for_breakpoint(mobile) {
       display: none;
