@@ -21,26 +21,22 @@ document.addEventListener("touchstart", (e) => {
 document.addEventListener(
   "touchmove",
   (e) => {
-    let x_cur =  e.touches[0].screenX;
-    let diff = ((x_start - x_cur) / window.innerWidth) * 100;
-    if (Math.abs(y - e.touches[0].screenY) < 5 ) {
+    let x_cur = e.changedTouches[0].screenX;
+    let diff = (((x_start - x_cur) / window.innerWidth) * 100).toFixed(2);
+    if (Math.abs(y - e.touches[0].screenY) < 10) {
       started = true;
       content.style.overflowY = "hidden";
       switch (currentPage) {
         case "posts": {
           pages.style.transition = "none";
           if (diff > 0) {
-            // sidebar_right.style.visibility = "visible";
-            // sidebar_left.style.visibility = "hidden";
-	    content.classList.add("right");
-	    content.classList.remove("left");
+            content.dataset.curPage = "right";
             pages.style.marginLeft = -diff + "%";
+            pages.style.marginRight = "0";
           } else if (diff < 0) {
-            // sidebar_left.style.visibility = "visible";
-            // sidebar_right.style.visibility = "hidden";
-	    content.classList.add("left");
-	    content.classList.remove("right");
+            content.dataset.curPage = "left";
             pages.style.marginRight = diff + "%";
+            pages.style.marginLeft = "0";
           }
           break;
         }
@@ -66,11 +62,12 @@ document.addEventListener(
   { passive: false }
 );
 document.addEventListener("touchend", (e) => {
-    started=false;
+  started = false;
   x_end = e.changedTouches[0].screenX;
   let dist = ((x_start - x_end) / window.innerWidth) * 100;
   switch (currentPage) {
     case "posts": {
+      pages.style.transition = "0.3s";
       if (dist > threshold) {
         sidebar_right.style.transition = "0.3s";
         sidebar_right.style.marginRight = "0";
@@ -82,7 +79,6 @@ document.addEventListener("touchend", (e) => {
         pages.style.marginRight = "-100%";
         currentPage = "left";
       } else if (Math.abs(dist) < threshold) {
-        pages.style.transition = "0.3s";
         pages.style.marginLeft = 0;
         pages.style.marginRight = 0;
         content.style.overflowY = "scroll";
@@ -108,7 +104,6 @@ document.addEventListener("touchend", (e) => {
         pages.style.marginLeft = "0";
         sidebar_right.style.marginRight = "-100%";
         currentPage = "posts";
-	
       } else if (dist > -threshold) {
         sidebar_right.style.transition = "0.3s";
         sidebar_right.style.marginRight = "0";
@@ -119,4 +114,6 @@ document.addEventListener("touchend", (e) => {
     default:
       break;
   }
+  setTimeout(function() {  content.dataset.curPage = currentPage;
+  }, 300);
 });

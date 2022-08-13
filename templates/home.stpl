@@ -5,7 +5,7 @@
 	<!-- custom -->
     <title>Aurora Board</title>
     <link rel="stylesheet" href="/css/home.css" />
-      <script  src="/home.js"></script>
+      <script  src="/home.js" defer></script>
       <script src="/like.js" defer></script>
       <script  src="/sidebars.js" defer></script>
      </head>
@@ -16,7 +16,7 @@
 	    <% include!("./leftside.stpl"); %>
 	</aside>
 
-	<div id="posts">
+	<div id="posts" data-cur-page="posts">
 		<div class="page">
   		<% for post in posts { %>
 		<% include!("./tiletemplatehome.stpl");%>

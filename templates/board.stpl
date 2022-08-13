@@ -9,7 +9,7 @@
       <link rel="stylesheet" href="/css/home.css" />
       <link rel="stylesheet" href="/css/newpost.css" />
       <script  src="/board.js" defer></script>
-      <script  src="/like.js"></script>
+      <script  src="/like.js" defer></script>
       <script  src="/sidebars.js" defer></script>
    </head>
    <body>
@@ -21,7 +21,7 @@
 			<input type="text" name="title"  maxlength="255" placeholder="title" required>
 		    </label>
 		    <label class="textarea">	
-			<textarea name="text" id="text" rows="8" cols="40" maxlength="20000" placeholder="text" required></textarea>
+			<textarea name="text" id="text" rows="20" cols="80" maxlength="20000" placeholder="text" required></textarea>
 		    </label>
 		</div>
 		<div class="buttons section">
@@ -33,12 +33,17 @@
 
 	<dialog  id="boardimg-modal" class="modal">
 	    <form action=<%=format!("{}/icon", board.name) %> method="post" enctype="multipart/form-data" class="panel">    
-	    <div class="inputs section">  	
-		<label id="file-upload">	
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+
+		<div class="title section">Edit Image</div>
+		<div class="inputs section">  	
+		    <label id="file-upload">	
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-upload"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
 			<input type="file" name="icon" id="icon" accept="image/png, image/jpeg, image/gif" required>
-		</label>
-		<button type="submit" class="submit button main-button">Upload</button>
+		    </label>
+		</div>
+		<div class="buttons section">
+		    <button type="reset" class="cancel button hover" onclick="close_modal(this)">Cancel</button>
+		    <button type="submit" class="submit button main-button">Upload</button>
 		</div>
 	    </form>
 	</dialog>
@@ -76,7 +81,7 @@
 	</dialog>
 
          <% include!("./navbar.stpl"); %>
-         <main id="content" class="">
+         <main id="content" class="" data-cur-page="posts">
             <aside id="sidebar-left" class="sidebar">
 		<% include!("./leftside.stpl"); %>
             </aside>
@@ -95,7 +100,7 @@
 		   <div id="info" class="section"> 
 		       <div id="board-img">
 			   <% if is_owner{ %>
-			    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="edit feather feather-edit" id="boardimg-edit"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+			    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="edit feather feather-edit" id="boardimg-edit" ><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
 			    <% } %>
 			    <img src= <%= board.icon %> alt="icon" id="icon">
 			</div>

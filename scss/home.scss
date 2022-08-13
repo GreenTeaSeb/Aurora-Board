@@ -1,4 +1,5 @@
 @import "tile";
+@import "post";
 @import "common";
 @import "media_queries";
 @import "navbar";
@@ -191,29 +192,29 @@ body {
     }
     @include for_breakpoint(mobile tablet) {
       overflow-x: clip;
-      gap: $padding;
-
       .sidebar {
         top: 0;
         position: sticky;
         transition: 0.3s;
         &#sidebar-left {
-          visibility: hidden;
+	    display: none;
           margin-left: -100%;
         }
         &#sidebar-right {
-          visibility: hidden;
+	    display: none;
           margin-right: -100%;
         }
       }
-      &.left #sidebar-left{
-          visibility: visible;
+      &[data-cur-page=left] #sidebar-left{
+	  display: flex;
       }
-      &.right #sidebar-right{
-          visibility: visible;
+      &[data-cur-page=right] #sidebar-right{
+	  display: flex;
       }
       #posts {
         margin: 0;
+	padding: 0 1rem;
+	box-sizing: border-box;
       }
       // flex-direction: column-reverse;
       // gap: $margin;

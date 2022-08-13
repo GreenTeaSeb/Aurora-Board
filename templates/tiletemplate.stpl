@@ -1,10 +1,10 @@
 		  <div class="header">
 		    <div class="data">
-		      <div class="info">
+		      <a class="info" href=  <%= format!("\"/posts/{}\"", post.id ) %> >
 			<img class= "pfp" src=<%= post.pfp%> alt=""> 
 			<p class="title"><%= post.title %></p>		
 			<p class="time"><%= super::post::time_msg(post.created_at)%></p>	
-		      </div>
+		      </a>
 		      <div class="text">
 			  <pre >
 			    <%= post.text %>

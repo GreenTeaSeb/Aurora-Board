@@ -1,6 +1,6 @@
 <nav id="topnav">
     <div id="title">
-    	 <a href="/">Auroroard</a>
+    	 <a href="/">Aurora Board</a>
     </div>
     <form  id="search">
     <select id="search-space">

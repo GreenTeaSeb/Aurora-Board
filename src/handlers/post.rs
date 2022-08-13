@@ -1,8 +1,12 @@
-use super::user::check_if_joined_board;
-use super::utils::sanitize_html;
+use super::{
+    user::check_if_joined_board, user::get_by_id, user::get_user_boards, user::User,
+    user::UserBoards, utils::sanitize_html,
+};
+use actix_identity::Identity;
 use actix_web::{self, web, HttpMessage, HttpRequest, HttpResponse, Responder};
 use anyhow::Result;
 use chrono::Utc;
+use sailfish::TemplateOnce;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, MySqlPool};
 
@@ -21,6 +25,26 @@ pub struct Post {
     pub title: String,
     pub text: String,
 }
+
+#[derive(Serialize, FromRow, Debug)]
+pub struct PostData {
+    pub id: u32,
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    pub poster_id: u32,
+    pub poster_pfp: String,
+    pub title: String,
+    pub text: String,
+}
+
+#[derive(TemplateOnce)]
+#[template(path = "post.stpl", escape = false)]
+struct PostTemplate {
+    user: Result<User>,
+    user_boards: Vec<UserBoards>,
+    post: PostData
+}
+
+
 
 //LOGIC
 
@@ -82,6 +106,20 @@ where user_id = ? and post_id = ?;"#,
     } else {
         None
     }
+}
+
+pub async fn get_post_by_id(id: u32, pool: &MySqlPool) -> Result<PostData> {
+    Ok(sqlx::query_as!(
+        PostData,
+        r#"
+	SELECT posts.id, posts.created_at,posts.poster_id,posts.title,posts.text, users.pfp as poster_pfp FROM  posts
+        INNER JOIN users ON users.id = posts.poster_id
+	WHERE posts.id = ? 
+        "#,
+        id
+    )
+    .fetch_one(pool)
+    .await?)
 }
 
 //API
@@ -150,3 +188,26 @@ pub async fn dislike_post(pool: web::Data<MySqlPool>, req: HttpRequest) -> impl 
 }
 
 //FRONTEND
+
+pub async fn post_pg(id: Identity, req: HttpRequest, pool: web::Data<MySqlPool>) -> impl Responder {
+    let post = req.match_info().get("post").unwrap_or_default().parse().unwrap_or_default();
+    let id: u32 = id
+        .identity()
+        .unwrap_or_default()
+        .parse()
+        .unwrap_or_default();
+
+    let user_data = get_by_id(&id, pool.get_ref()).await;
+
+    let post_data = match get_post_by_id(post, pool.get_ref()).await {
+        Ok(d) => d,
+        Err(x) => return HttpResponse::NotFound().body(x.to_string())
+    };
+
+    let temp = PostTemplate {
+        user: user_data,
+        user_boards: get_user_boards(id, pool.get_ref()).await,
+        post: post_data,
+    };
+    HttpResponse::Found().body(temp.render_once().unwrap())
+}

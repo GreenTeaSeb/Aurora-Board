@@ -5,8 +5,9 @@
 	<!-- custom -->
     <title>Aurora Board - <%=user_guest.username%></title>
      <link rel="stylesheet" href="/css/home.css" />
-      <script type="module" src="/home.js"></script>
-      <script src="/like.js"></script>
+      <script src="/home.js" defer></script>
+      <script src="/like.js" defer></script>
+      <script src="/sidebars.js" defer></script>
      </head>
   <body>
      <% include!("./navbar.stpl"); %>
@@ -14,7 +15,7 @@
         <aside id="sidebar-left" class="sidebar">
 	    <% include!("./leftside.stpl"); %>
 	</aside>
-	<div id="posts">
+	<div id="posts" data-cur-page="posts">
 		<div class="page">
 		<% for post in posts { %>
 		<% include!("./tiletemplatehome.stpl");%>

@@ -8,9 +8,9 @@ var offset = params.has("page") ? parseInt(params.get("page")) : 0;
 let parser = new DOMParser();
 
 const get_posts = async () => {
-  if ((window.innerHeight + window.pageYOffset) >= document.body.offsetHeight - 20) {
+  if (main.offsetHeight + main.scrollTop >= main.scrollHeight) {
     posts_loading.style.display = "flex";
-    await new Promise(r => setTimeout(r, 2000));
+    // await new Promise(r => setTimeout(r, 2000));
     const url = baseurl + "?page=" + (offset + 1);
     console.debug("Fetching at: " + url);
     const res = await fetch(url);
