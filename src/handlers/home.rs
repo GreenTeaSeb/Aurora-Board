@@ -22,7 +22,7 @@ pub struct BoardPost {
 }
 
 #[derive(TemplateOnce)]
-#[template(path = "home.stpl", escape = false)]
+#[template(path = "home.html", escape = false)]
 struct HomeTemplate {
     user: anyhow::Result<User>,
     top_boards: Vec<BoardEntry>,

@@ -18,7 +18,7 @@ pub struct User {
 }
 
 #[derive(TemplateOnce)]
-#[template(path = "user.stpl", escape = false)]
+#[template(path = "user.html", escape = false)]
 struct UserTemplate {
     user: Result<User>,
     user_guest: User,

@@ -1,7 +1,7 @@
 $bg: #202020;
-$text: #e5e5e5;
-$secondary-text: #b5b5b5;
-$surface: #313131;
+$text: #bbbbbb;
+$secondary-text: #73757a;
+$surface: #303030;
 $primary: #4670c2;
 $secondary: #6cdbc3;
 $border: 1px solid $bg;
@@ -81,6 +81,7 @@ $shadow: 0 0 10px black;
   color: $text;
   padding: 0.5rem 1rem;
   font-family: $big-font;
+  transition: 0.3s;
   &:hover {
     box-shadow: 0 0 5px $primary;
   }

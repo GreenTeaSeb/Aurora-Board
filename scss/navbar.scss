@@ -2,7 +2,6 @@
 @import "media_queries";
 
 #topnav {
-  filter: drop-shadow(0 0 0.75rem black);
   background-color: $surface;
   display: flex;
   // align-items: stretch;
@@ -11,7 +10,7 @@
   align-self: stretch;
   position: sticky;
   height: $navbar-height;
-  padding: 0.25rem;
+  padding: 0.5rem $margin;
   gap: 2rem;
   z-index: 9;
   top: 0;

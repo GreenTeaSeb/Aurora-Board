@@ -44,6 +44,7 @@ body {
     overflow-y: scroll;
     padding-top: $margin;
     filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.5));
+    // filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.5));
     #posts {
       display: flex;
       flex-direction: column;
@@ -98,7 +99,7 @@ body {
     #sidebar-left {
       .section:first-child {
         li {
-          padding: $padding;
+          padding: 0.5rem;
         }
       }
     }

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<dialog  id="newpost-modal" class="modal">
+    <form action="" method="post" class="panel">    
+	<div class="title section">New Post</div>
+	<div class="inputs section">  	
+	    <label>
+		<input type="text" name="title"  maxlength="255" placeholder="title" required>
+	    </label>
+	    <label class="textarea">	
+		<textarea name="text" id="text" rows="10" cols="80" maxlength="20000" placeholder="text" required></textarea>
+	    </label>
+	</div>
+	<div class="buttons section">
+	    <button type="reset" class="cancel button hover" onclick="close_modal(this)">Cancel</button>
+	    <button type="submit" class="submit button main-button">Post</button>
+	</div>
+    </form>	
+</dialog>

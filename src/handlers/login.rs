@@ -37,7 +37,7 @@ pub struct LoginQuery {
 }
 
 #[derive(TemplateOnce)]
-#[template(path = "login.stpl", escape = false)]
+#[template(path = "login.html", escape = false)]
 struct LoginTemplate {
     redirect_path: String,
 }

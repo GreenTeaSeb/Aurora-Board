@@ -12,6 +12,7 @@ mod handlers;
 #[actix_web::main]
 async fn main() -> Result<()> {
     dotenv().ok();
+
     let database_url = env::var("DATABASE_URL").expect("DATABASE is not set");
     let host = env::var("HOST").expect("HOST ip is not set");
     let port = env::var("PORT")
@@ -62,19 +63,20 @@ async fn main() -> Result<()> {
             )
             .service(
                 web::scope("/posts")
-                .route("{post}", web::get().to(handlers::post::post_pg))
-                .service(
-                    web::scope("{post}")
-                    .wrap(handlers::middleware::LoginAuth)
-                    .route("like", web::post().to(handlers::post::like_post))
-                    .route("dislike", web::post().to(handlers::post::dislike_post)),
-                )
+                    .route("{post}", web::get().to(handlers::post::post_pg))
+                    .service(
+                        web::scope("{post}")
+                            .wrap(handlers::middleware::LoginAuth)
+                            .route("like", web::post().to(handlers::post::like_post))
+                            .route("dislike", web::post().to(handlers::post::dislike_post)),
+                    ),
             )
             .service(fs::Files::new("/data", "./data/").show_files_listing())
             .service(fs::Files::new("", "./static/").show_files_listing())
     })
     .bind_openssl((host, port), builder)?
     // .bind((host,port))?
+    // .bind(("127.0.0.1",8096))?
     .run()
     .await?;
     Ok(())

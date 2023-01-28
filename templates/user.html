@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-<% include!("./header.stpl"); %>
+<% include!("./header.html"); %>
 	<!-- custom -->
     <title>Aurora Board - <%=user_guest.username%></title>
      <link rel="stylesheet" href="/css/home.css" />
@@ -10,18 +10,18 @@
       <script src="/sidebars.js" defer></script>
      </head>
   <body>
-     <% include!("./navbar.stpl"); %>
+     <% include!("./navbar.html"); %>
     <main id="content" class="">
         <aside id="sidebar-left" class="sidebar">
-	    <% include!("./leftside.stpl"); %>
+	    <% include!("./leftside.html"); %>
 	</aside>
 	<div id="posts" data-cur-page="posts">
 		<div class="page">
 		<% for post in posts { %>
-		<% include!("./tiletemplatehome.stpl");%>
+		<% include!("./tiletemplatehome.html");%>
 		    <%};%>
 		</div>
-		<% include!("./loading.stpl");%>
+		<% include!("./loading.html");%>
        </div>
        <aside id="sidebar-right" class="sidebar">
 		<div id="board-info" class="panel"> 	

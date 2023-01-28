@@ -37,14 +37,13 @@ pub struct PostData {
 }
 
 #[derive(TemplateOnce)]
-#[template(path = "post.stpl", escape = false)]
+#[template(path = "post.html", escape = false)]
 struct PostTemplate {
     user: Result<User>,
     user_boards: Vec<UserBoards>,
-    post: PostData
+    post: PostData,
+    status: Option<bool>
 }
-
-
 
 //LOGIC
 
@@ -190,7 +189,12 @@ pub async fn dislike_post(pool: web::Data<MySqlPool>, req: HttpRequest) -> impl 
 //FRONTEND
 
 pub async fn post_pg(id: Identity, req: HttpRequest, pool: web::Data<MySqlPool>) -> impl Responder {
-    let post = req.match_info().get("post").unwrap_or_default().parse().unwrap_or_default();
+    let post = req
+        .match_info()
+        .get("post")
+        .unwrap_or_default()
+        .parse()
+        .unwrap_or_default();
     let id: u32 = id
         .identity()
         .unwrap_or_default()
@@ -201,13 +205,14 @@ pub async fn post_pg(id: Identity, req: HttpRequest, pool: web::Data<MySqlPool>)
 
     let post_data = match get_post_by_id(post, pool.get_ref()).await {
         Ok(d) => d,
-        Err(x) => return HttpResponse::NotFound().body(x.to_string())
+        Err(x) => return HttpResponse::NotFound().body(x.to_string()),
     };
 
     let temp = PostTemplate {
         user: user_data,
         user_boards: get_user_boards(id, pool.get_ref()).await,
         post: post_data,
+        status: is_liked(id, post, pool.get_ref()).await
     };
     HttpResponse::Found().body(temp.render_once().unwrap())
 }

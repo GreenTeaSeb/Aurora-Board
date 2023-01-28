@@ -41,7 +41,7 @@ pub struct BoardData {
 }
 
 #[derive(TemplateOnce)]
-#[template(path = "board.stpl", escape = false)]
+#[template(path = "board.html", escape = false)]
 struct BoardTemplate {
     board: Board,
     user: anyhow::Result<User>,
@@ -166,7 +166,10 @@ async fn edit_board_db(board: &str, form: BoardData, pool: &MySqlPool) -> Result
     sqlx::query!(
         r#"
         UPDATE boards
-        SET name = ? , description = ? , private = ?
+        SET 
+        name = coalesce( nullif(?,''), name) , 
+        description = coalesce(nullif(?,''),description) ,
+        private = ?
         WHERE boards.name = ?
 	"#,
         form.name,
@@ -189,14 +192,14 @@ pub async fn get_n_posts(
     sqlx::query_as!(
         BoardPost,
         r#"
-select posts.id,posts.created_at,poster_id,board_id,title,text, likes.is_like as status, users.pfp from posts
-left join likes on likes.post_id = posts.id and likes.user_id = ?
-inner join users on users.id = poster_id
-where board_id = (select id from boards where name = ?)
-order by created_at desc
-limit ?
-offset ?
-"#,
+        select posts.id,posts.created_at,poster_id,board_id,title,text, likes.is_like as status, users.pfp from posts
+        left join likes on likes.post_id = posts.id and likes.user_id = ?
+        inner join users on users.id = poster_id
+        where board_id = (select id from boards where name = ?)
+        order by created_at desc
+        limit ?
+        offset ?
+        "#,
         id,
         board_name,
         limit,
@@ -236,9 +239,9 @@ async fn set_icon(
 ) -> Result<sqlx::mysql::MySqlQueryResult, sqlx::Error> {
     sqlx::query!(
         r#"
-update boards
-set icon = ? 
-where name = ?
+        update boards
+        set icon = ? 
+        where name = ?
         "#,
         format!("/data/{}", file_name),
         board
@@ -357,7 +360,7 @@ pub async fn delete_board(pool: web::Data<MySqlPool>, req: HttpRequest) -> impl 
     }
 
     if let Err(x) = delete_board_db(board, pool.get_ref()).await {
-        return HttpResponse::NotFound()
+        return HttpResponse::InternalServerError()
             .body("Failed to delete board: ".to_owned() + &x.to_string());
     }
 
