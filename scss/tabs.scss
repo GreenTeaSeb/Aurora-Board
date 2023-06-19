@@ -1,0 +1,29 @@
+@import "common";
+
+#tabs {
+    display: flex;
+    gap: $margin;
+
+    .tab {
+        flex: 1 1 0px;
+        background-color: rgba($surface, 0.5);
+        padding: $padding/2;
+        border-radius: 360px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: $secondary-text;
+        font-family: $big-font;
+        text-decoration: none;
+
+        height: 1.5rem;
+        &.selected {
+            background-color: $surface;
+            color: $text;
+        }
+        svg{
+            height: 100%;
+            margin-right: 0.5rem;
+        }
+    }
+}

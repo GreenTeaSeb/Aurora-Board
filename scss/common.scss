@@ -1,6 +1,6 @@
 $bg: #202020;
 $text: #bbbbbb;
-$secondary-text: #73757a;
+$secondary-text: #919399;
 $surface: #303030;
 $primary: #4670c2;
 $secondary: #6cdbc3;
@@ -114,6 +114,7 @@ $shadow: 0 0 10px black;
     text-align: center;
     color: $text;
     margin: 0;
+    overflow-wrap: anywhere;
   }
   p,
   a:not(.button) {
@@ -253,6 +254,11 @@ $shadow: 0 0 10px black;
     &:hover {
       box-shadow: 0 0 5px $red;
     }
+  
+  }
+
+  #delete{
+    color: $text;
   }
 
   #errors {

@@ -12,6 +12,7 @@ const like = (e, f) => {
     f.classList.add("liked");
   });
 };
+
 const dislike = (e, f) => {
   e.preventDefault();
   fetch(e.target.action, {

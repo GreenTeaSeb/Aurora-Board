@@ -24,7 +24,7 @@
 			</div>
 			<div id="posts" data-cur-page="posts">
 				<div id="tabs">
-					<a  href= <%= format!("/users/{}/posts", user_guest.id) %>  class="tab selected">
+					<a href="posts" class="tab">
 						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
 							stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
 							class="feather feather-pocket">
@@ -34,7 +34,7 @@
 						</svg>
 						Topics
 					</a>
-					<a  href= <%= format!("/users/{}/replies", user_guest.id) %>  class="tab">
+					<a href="replies" class="tab selected">
 						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
 							stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
 							class="feather feather-message-square">
@@ -43,7 +43,7 @@
 
 						Replies
 					</a>
-					<a  href= <%= format!("/users/{}/likes", user_guest.id) %>  class="tab">
+					<a href="likes" class="tab">
 						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
 							stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
 							class="feather feather-thumbs-up">
@@ -53,7 +53,7 @@
 						</svg>
 						Likes
 					</a>
-					<a  href= <%= format!("/users/{}/dislikes", user_guest.id) %>  class="tab">
+					<a href="dislikes" class="tab">
 						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
 							stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
 							class="feather feather-thumbs-down">
@@ -66,8 +66,7 @@
 				</div>
 				<div class="page">
 					<% for post in posts { %>
-						<% include!("./tiletemplatehome.html");%>
-							<%};%>
+					<%};%>
 				</div>
 				<% include!("./loading.html");%>
 			</div>

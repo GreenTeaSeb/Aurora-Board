@@ -40,6 +40,7 @@ where
     fn call(&self, req: ServiceRequest) -> Self::Future {
         let id = req.get_identity();
         let path = get_path(&req);
+        let method = req.method().as_str().to_owned();
 
         if id.is_some() {
             let user_id_int: u32 = id.unwrap_or_default().parse().unwrap_or_default();
@@ -51,7 +52,10 @@ where
 
         Either::Right(ok(req.into_response(
             HttpResponse::Found()
-                .append_header(("location", format!("/login?redirect={}", path)))
+                .append_header((
+                    "location",
+                    format!("/login?redirect={}&method={}", path, method),
+                ))
                 .body("Not logged in"),
         )))
     }

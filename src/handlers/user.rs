@@ -1,11 +1,13 @@
 use super::home::BoardPost;
+use crate::handlers::reply::Reply;
 use actix_identity::Identity;
 use actix_web::{web, HttpRequest, HttpResponse};
 use anyhow::Result;
 use sailfish::TemplateOnce;
+use serde::Serialize;
 use sqlx::MySqlPool;
 
-#[derive(Debug)]
+#[derive(Serialize, Debug)]
 pub struct User {
     pub id: u32,
     pub username: String,
@@ -15,15 +17,6 @@ pub struct User {
     pub pfp: String,
     pub banner: String,
     pub bio: Option<String>,
-}
-
-#[derive(TemplateOnce)]
-#[template(path = "user.html", escape = false)]
-struct UserTemplate {
-    user: Result<User>,
-    user_guest: User,
-    user_boards: Vec<UserBoards>,
-    posts: Vec<BoardPost>,
 }
 
 pub async fn get_by_id(id: &u32, pool: &MySqlPool) -> Result<User> {
@@ -37,33 +30,6 @@ pub async fn get_by_id(id: &u32, pool: &MySqlPool) -> Result<User> {
     )
     .fetch_one(pool)
     .await?)
-}
-
-pub async fn user_page(id: Identity, req: HttpRequest, pool: web::Data<MySqlPool>) -> HttpResponse {
-    let id_guest = req.match_info().get("id").ok_or("no such id");
-    let id_guest_int: u32 = id_guest.unwrap_or_default().parse().unwrap_or_default();
-    let user_guest_data = get_by_id(&id_guest_int, pool.get_ref()).await;
-    let id_int: u32 = id
-        .identity()
-        .unwrap_or_default()
-        .parse()
-        .unwrap_or_default();
-    let user_data = get_by_id(&id_int, pool.get_ref()).await;
-
-    match user_guest_data {
-        Ok(u) => {
-            let temp = UserTemplate {
-                user: user_data,
-                user_guest: u,
-                user_boards: get_user_boards(id_int, pool.get_ref()).await,
-                // posts: get_member_posts(&id_int, pool.get_ref(), 10, q.page.unwrap_or_default()).await,
-                posts: get_user_posts(id_guest_int, pool.as_ref(), 10, 0).await,
-            };
-
-            HttpResponse::Ok().body(temp.render_once().unwrap())
-        }
-        Err(_) => HttpResponse::NotFound().body("User doesn't exist"),
-    }
 }
 
 pub async fn check_if_joined_board(id: u32, board: &str, pool: &MySqlPool) -> Result<bool> {
@@ -130,4 +96,97 @@ offset ?;
     .fetch_all(pool)
     .await
     .unwrap_or_default()
+}
+
+async fn get_user_replies(poster_id: u32, pool: &MySqlPool, limit: u32, offset: u32) -> Vec<Reply> {
+    sqlx::query_as!(
+        Reply,
+        r#"
+    select replies.id, replies.created_at, replies.poster_id , replies.parent_id , replies.text from replies
+    where replies.poster_id = ?
+    limit ?
+    offset ?;
+    "#,poster_id, limit, offset * limit
+    )
+    .fetch_all(pool)
+    .await
+    .unwrap_or_default()
+}
+
+// FRONTEND
+
+#[derive(TemplateOnce)]
+#[template(path = "user.html", escape = false)]
+struct UserTemplate {
+    user: Result<User>,
+    user_guest: User,
+    user_boards: Vec<UserBoards>,
+    posts: Vec<BoardPost>,
+}
+
+#[derive(TemplateOnce)]
+#[template(path = "user_replies.html", escape = false)]
+struct UserTemplateReplies {
+    user: Result<User>,
+    user_guest: User,
+    user_boards: Vec<UserBoards>,
+    posts: Vec<Reply>,
+}
+
+pub async fn user_page(id: Identity, req: HttpRequest, pool: web::Data<MySqlPool>) -> HttpResponse {
+    let id_guest = req.match_info().get("id").ok_or("no such id");
+    let id_guest_int: u32 = id_guest.unwrap_or_default().parse().unwrap_or_default();
+    let user_guest_data = get_by_id(&id_guest_int, pool.get_ref()).await;
+    let id_int: u32 = id
+        .identity()
+        .unwrap_or_default()
+        .parse()
+        .unwrap_or_default();
+    let user_data = get_by_id(&id_int, pool.get_ref()).await;
+
+    match user_guest_data {
+        Ok(u) => {
+            let temp = UserTemplate {
+                user: user_data,
+                user_guest: u,
+                user_boards: get_user_boards(id_int, pool.get_ref()).await,
+                // posts: get_member_posts(&id_int, pool.get_ref(), 10, q.page.unwrap_or_default()).await,
+                posts: get_user_posts(id_guest_int, pool.as_ref(), 10, 0).await,
+            };
+
+            HttpResponse::Ok().body(temp.render_once().unwrap())
+        }
+        Err(_) => HttpResponse::NotFound().body("User doesn't exist"),
+    }
+}
+
+pub async fn user_page_replies(
+    id: Identity,
+    req: HttpRequest,
+    pool: web::Data<MySqlPool>,
+) -> HttpResponse {
+    let id_guest = req.match_info().get("id").ok_or("no such id");
+    let id_guest_int: u32 = id_guest.unwrap_or_default().parse().unwrap_or_default();
+    let user_guest_data = get_by_id(&id_guest_int, pool.get_ref()).await;
+    let id_int: u32 = id
+        .identity()
+        .unwrap_or_default()
+        .parse()
+        .unwrap_or_default();
+    let user_data = get_by_id(&id_int, pool.get_ref()).await;
+
+    match user_guest_data {
+        Ok(u) => {
+            let temp = UserTemplateReplies {
+                user: user_data,
+                user_guest: u,
+                user_boards: get_user_boards(id_int, pool.get_ref()).await,
+                // posts: get_member_posts(&id_int, pool.get_ref(), 10, q.page.unwrap_or_default()).await,
+                posts: get_user_replies(id_guest_int, pool.as_ref(), 10, 0).await,
+            };
+
+            HttpResponse::Ok().body(temp.render_once().unwrap())
+        }
+        Err(_) => HttpResponse::NotFound().body("User doesn't exist"),
+    }
 }

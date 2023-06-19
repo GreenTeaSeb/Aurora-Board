@@ -54,12 +54,14 @@ struct BoardTemplate {
 #[derive(Deserialize, Debug)]
 pub struct BoardQuery {
     page: Option<u32>,
+    search: Option<String>,
 }
 
 #[derive(Deserialize, Debug)]
 pub struct GetPostsQuery {
     limit: u32,
     offset: u32,
+    search: String,
 }
 
 #[derive(Serialize, FromRow, Debug)]
@@ -188,6 +190,7 @@ pub async fn get_n_posts(
     pool: &MySqlPool,
     limit: u32,
     offset: u32,
+    search_param: String,
 ) -> Vec<BoardPost> {
     sqlx::query_as!(
         BoardPost,
@@ -195,13 +198,15 @@ pub async fn get_n_posts(
         select posts.id,posts.created_at,poster_id,board_id,title,text, likes.is_like as status, users.pfp from posts
         left join likes on likes.post_id = posts.id and likes.user_id = ?
         inner join users on users.id = poster_id
-        where board_id = (select id from boards where name = ?)
+        where board_id = (select id from boards where name = ?) and (lower(text) like ? or lower(title) like ?)
         order by created_at desc
         limit ?
         offset ?
         "#,
         id,
         board_name,
+        format!("%{}%",search_param),
+        format!("%{}%",search_param),
         limit,
         offset * limit
     )
@@ -270,7 +275,8 @@ pub async fn board_pg(
         .unwrap_or_default();
     let user_data = user::get_by_id(&id, pool.get_ref()).await;
     let board_data = get_by_name(board, pool.get_ref()).await;
-    let offset = q.page.unwrap_or_default();
+    let offset = q.page.to_owned().unwrap_or_default();
+    let search_param = q.search.to_owned().unwrap_or_default();
     let isin = check_if_joined_board(id, board, pool.get_ref())
         .await
         .unwrap_or_default();
@@ -285,7 +291,15 @@ pub async fn board_pg(
                     .await
                     .unwrap_or_default(),
                 user_boards: get_user_boards(id, pool.get_ref()).await,
-                posts: get_n_posts(board.to_string(), id, pool.get_ref(), 10, offset).await,
+                posts: get_n_posts(
+                    board.to_string(),
+                    id,
+                    pool.get_ref(),
+                    10,
+                    offset,
+                    search_param,
+                )
+                .await,
             };
             HttpResponse::Found().body(temp.render_once().unwrap())
         }
@@ -319,9 +333,10 @@ pub async fn join_board(pool: web::Data<MySqlPool>, req: HttpRequest) -> impl Re
     if user_join(&id, board, pool.get_ref()).await.is_err() {
         return HttpResponse::InternalServerError().body("Failed to join");
     }
-    return HttpResponse::Found()
-        .append_header(("location", format!("/boards/{}", board)))
-        .finish();
+    return HttpResponse::Ok().finish();
+    // return HttpResponse::Found()
+    //     .append_header(("location", format!("/boards/{}", board)))
+    //     .finish();
 }
 
 pub async fn leave_board(pool: web::Data<MySqlPool>, req: HttpRequest) -> impl Responder {
@@ -338,9 +353,10 @@ pub async fn leave_board(pool: web::Data<MySqlPool>, req: HttpRequest) -> impl R
         return HttpResponse::NotFound().body("Board doesn't exist");
     }
     if user_leave(&id, board, pool.get_ref()).await.is_ok() {
-        return HttpResponse::Found()
-            .append_header(("location", format!("/boards/{}", board)))
-            .finish();
+        return HttpResponse::Ok().finish();
+        // return HttpResponse::Found()
+        //     .append_header(("location", format!("/boards/{}", board)))
+        //     .finish();
     }
     HttpResponse::InternalServerError().body("Failed to leave board")
 }
@@ -380,9 +396,10 @@ pub async fn newboard(
             if let Err(err) = user_join(&id, &board_id, pool.as_ref()).await {
                 return HttpResponse::InternalServerError().body(err.to_string());
             }
-            HttpResponse::Found()
-                .append_header(("location", format!("/boards/{}", board_id)))
-                .json(board_id)
+            HttpResponse::Ok().json(board_id)
+            // HttpResponse::Found()
+            //     .append_header(("location", format!("/boards/{}", board_id)))
+            //     .json(board_id)
         }
         Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
     }
@@ -419,8 +436,17 @@ pub async fn get_posts(
     q: Query<GetPostsQuery>,
 ) -> impl Responder {
     let board = req.match_info().get("name").ok_or("").unwrap_or_default();
-    HttpResponse::Found()
-        .json(get_n_posts(board.to_string(), 0, pool.get_ref(), q.limit, q.offset).await)
+    HttpResponse::Found().json(
+        get_n_posts(
+            board.to_string(),
+            0,
+            pool.get_ref(),
+            q.limit,
+            q.offset,
+            q.search.to_owned(),
+        )
+        .await,
+    )
 }
 
 pub async fn new_icon(

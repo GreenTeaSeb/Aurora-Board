@@ -1,6 +1,6 @@
 <div class="header">
 	<div class="data">
-		<a class="info" href=<%=format!("\"/posts/{}\"", post.id ) %> >
+		<a class="info" href=<%=format!("\"/boards/{}/topics/{}\"",board.name, post.id ) %> >
 			<img class="pfp" src=<%=post.pfp%> alt="">
 			<p class="title">
 				<%= post.title %>
@@ -16,7 +16,15 @@
 		</div>
 	</div>
 	<div class=<%=format!("\" options {}\"" , match post.status {Some(1)=> "liked",Some(0) => "disliked",_ => ""})%> >
-		<form class="like-form hover" action=<%=format!("\"/posts/{}/like\"" ,post.id)%> method="post"  onsubmit="like(event,this.parentElement)">
+		<a class="hover comments"  href=<%=format!("\"/boards/{}/topics/{}\"",board.name, post.id ) %>>
+			<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+				stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+				class="feather feather-message-square">
+				<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+			</svg>
+		</a>
+		<form class="like-form hover" action=<%=format!("\"/topics/{}/like\"" ,post.id)%> method="post"
+			onsubmit="like(event,this.parentElement)">
 			<label>
 				<input type="submit">
 				<svg class="like" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -28,7 +36,7 @@
 				</svg>
 			</label>
 		</form>
-		<form action=<%=format!("\"/posts/{}/dislike\"", post.id)%> method="post" class="hover"
+		<form action=<%=format!("\"/topics/{}/dislike\"", post.id)%> method="post" class="hover"
 			onsubmit="dislike(event,this.parentElement)">
 			<label>
 				<input type="submit">

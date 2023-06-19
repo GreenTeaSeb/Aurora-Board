@@ -21,11 +21,11 @@ async fn main() -> Result<()> {
         .expect("Port must be a number");
     env::var("DATA").expect("Data folder is not set");
     let db_pool = MySqlPool::connect(&database_url).await?;
-    let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
-    builder
-        .set_private_key_file("key.pem", SslFiletype::PEM)
-        .unwrap();
-    builder.set_certificate_chain_file("cert.pem").unwrap();
+    // let mut builder = SslAcceptor::mozilla_intermediate(SslMethod::tls()).unwrap();
+    // builder
+    // .set_private_key_file("key.pem", SslFiletype::PEM)
+    // .unwrap();
+    // builder.set_certificate_chain_file("cert.pem").unwrap();
     HttpServer::new(move || {
         App::new()
             .app_data(Data::new(db_pool.clone()))
@@ -39,20 +39,52 @@ async fn main() -> Result<()> {
             .route("/logout", web::get().to(handlers::login::logout))
             .route("/signup", web::post().to(handlers::login::signup))
             .route("/login", web::post().to(handlers::login::login))
-            .service(web::scope("/users").route("{id}", web::get().to(handlers::user::user_page)))
+            .service(
+                web::scope("/users")
+                    .route("{id}", web::get().to(handlers::user::user_page))
+                    .service(
+                        web::scope("{id}")
+                            .route("replies", web::get().to(handlers::user::user_page_replies))
+                            .route("posts", web::get().to(handlers::user::user_page)),
+                    ),
+            )
             .service(
                 web::scope("/boards")
                     .route("{name}", web::get().to(handlers::board::board_pg))
-                    .route("{name}/posts", web::get().to(handlers::board::get_posts))
+                    .route("{name}/topics", web::get().to(handlers::board::get_posts))
                     .service(
                         web::scope("{name}")
-                            .wrap(handlers::middleware::LoginAuth)
-                            .route("join", web::post().to(handlers::board::join_board))
-                            .route("leave", web::post().to(handlers::board::leave_board))
-                            .route("delete", web::post().to(handlers::board::delete_board))
-                            .route("edit", web::post().to(handlers::board::edit_board))
-                            .route("", web::post().to(handlers::post::newpost))
-                            .route("icon", web::post().to(handlers::board::new_icon)),
+                            .service(
+                                web::scope("topics")
+                                    .route("{post}", web::get().to(handlers::post::post_pg))
+                                    .service(
+                                        web::scope("{post}")
+                                            .wrap(handlers::middleware::LoginAuth)
+                                            .route("", web::post().to(handlers::reply::new_reply))
+                                            .route(
+                                                "like",
+                                                web::post().to(handlers::post::like_post),
+                                            )
+                                            .route(
+                                                "dislike",
+                                                web::post().to(handlers::post::dislike_post),
+                                            )
+                                            .route(
+                                                "delete",
+                                                web::post().to(handlers::post::delete_post),
+                                            ),
+                                    ),
+                            )
+                            .service(
+                                web::scope("")
+                                    .wrap(handlers::middleware::LoginAuth)
+                                    .route("join", web::post().to(handlers::board::join_board))
+                                    .route("leave", web::post().to(handlers::board::leave_board))
+                                    .route("delete", web::post().to(handlers::board::delete_board))
+                                    .route("edit", web::post().to(handlers::board::edit_board))
+                                    .route("", web::post().to(handlers::post::newpost))
+                                    .route("icon", web::post().to(handlers::board::new_icon)),
+                            ),
                     )
                     .service(
                         web::scope("")
@@ -62,21 +94,29 @@ async fn main() -> Result<()> {
                     ),
             )
             .service(
-                web::scope("/posts")
-                    .route("{post}", web::get().to(handlers::post::post_pg))
-                    .service(
-                        web::scope("{post}")
-                            .wrap(handlers::middleware::LoginAuth)
-                            .route("like", web::post().to(handlers::post::like_post))
-                            .route("dislike", web::post().to(handlers::post::dislike_post)),
-                    ),
+                web::scope("topics").service(
+                    web::scope("{post}")
+                        .wrap(handlers::middleware::LoginAuth)
+                        .route("", web::post().to(handlers::reply::new_reply))
+                        .route("like", web::post().to(handlers::post::like_post))
+                        .route("dislike", web::post().to(handlers::post::dislike_post))
+                        .route("delete", web::post().to(handlers::post::delete_post)),
+                ),
+            )
+            .service(
+                web::scope("replies").service(
+                    web::scope("{reply}")
+                        .wrap(handlers::middleware::LoginAuth)
+                        .route("like", web::post().to(handlers::reply::like_reply))
+                        .route("dislike", web::post().to(handlers::reply::dislike_reply)),
+                ),
             )
             .service(fs::Files::new("/data", "./data/").show_files_listing())
             .service(fs::Files::new("", "./static/").show_files_listing())
     })
-    .bind_openssl((host, port), builder)?
-    // .bind((host,port))?
-    // .bind(("127.0.0.1",8096))?
+    // .bind_openssl((host, port), builder)?
+    .bind((host,port))?
+    // .bind(("127.0.0.1", 8096))?
     .run()
     .await?;
     Ok(())

@@ -46,6 +46,7 @@ enum Filter {
 pub struct GetPostsQuery {
     filter: Option<Filter>,
     page: Option<u32>,
+    search: Option<String>,
 }
 
 async fn get_top(pool: &MySqlPool) -> Result<Vec<BoardEntry>, sqlx::Error> {
@@ -68,34 +69,53 @@ pub async fn get_member_posts(
     pool: &MySqlPool,
     limit: u32,
     offset: u32,
+    search_param: String,
 ) -> Vec<BoardPost> {
     sqlx::query_as!(
         BoardPost,
         r#"
-SELECT posts.id ,posts.created_at ,posts.poster_id ,( select name from boards where id = posts.board_id) as board_name, ( select icon from boards where id = posts.board_id) as board_icon ,posts.title ,posts.`text` , likes.is_like as status FROM posts
-INNER JOIN members on members.board_id = posts.board_id 
-lEFT JOIN likes on likes.post_id = id and likes.user_id = ?
-where members.user_id  = ?
-ORDER BY posts.created_at DESC
-limit ?
-offset ?;
-"#,id, id, limit, offset * limit
+        SELECT posts.id ,posts.created_at ,posts.poster_id ,( select name from boards where id = posts.board_id) as board_name, ( select icon from boards where id = posts.board_id) as board_icon ,posts.title ,posts.`text` , likes.is_like as status FROM posts
+        INNER JOIN members on members.board_id = posts.board_id 
+        lEFT JOIN likes on likes.post_id = id and likes.user_id = ?
+        where members.user_id  = ? and (lower(text) like ? or lower(title) like ?)
+        ORDER BY posts.created_at DESC
+        limit ?
+        offset ?;
+        "#,
+        id, 
+        id,
+        format!("%{}%",search_param),
+        format!("%{}%",search_param),
+        limit,
+        offset * limit
     )
     .fetch_all(pool)
     .await
     .unwrap_or_default()
 }
 
-pub async fn get_all_posts(pool: &MySqlPool, limit: u32, offset: u32, id: u32) -> Vec<BoardPost> {
+pub async fn get_all_posts(
+    pool: &MySqlPool,
+    limit: u32,
+    offset: u32,
+    id: u32,
+    search_param: String,
+) -> Vec<BoardPost> {
     sqlx::query_as!(
         BoardPost,
         r#"
-SELECT posts.id ,posts.created_at ,posts.poster_id ,( select name from boards where id = posts.board_id) as board_name, ( select icon from boards where id = posts.board_id) as board_icon ,posts.title ,posts.`text`,likes.is_like as status FROM posts
-lEFT JOIN likes on likes.post_id = id and likes.user_id = ?
-ORDER BY posts.created_at DESC
-limit ?
-offset ?;
-"#,id,limit, offset * limit
+        SELECT posts.id ,posts.created_at ,posts.poster_id ,( select name from boards where id = posts.board_id) as board_name, ( select icon from boards where id = posts.board_id) as board_icon ,posts.title ,posts.`text`,likes.is_like as status FROM posts
+        lEFT JOIN likes on likes.post_id = id and likes.user_id = ?
+        WHERE (lower(text) like ? or lower(title) like ?)
+        ORDER BY posts.created_at DESC
+        limit ?
+        offset ?;
+        "#,
+        id,
+        format!("%{}%",search_param),
+        format!("%{}%",search_param),
+        limit,
+        offset * limit
     )
     .fetch_all(pool)
     .await
@@ -120,10 +140,24 @@ pub async fn home(
         user_boards: get_user_boards(id_int, pool.get_ref()).await,
         posts: match q.filter.as_ref().unwrap_or(&Filter::All) {
             Filter::Feed => {
-                get_member_posts(id_int, pool.get_ref(), 10, q.page.unwrap_or_default()).await
+                get_member_posts(
+                    id_int,
+                    pool.get_ref(),
+                    10,
+                    q.page.unwrap_or_default(),
+                    q.search.to_owned().unwrap_or_default(),
+                )
+                .await
             }
             Filter::All => {
-                get_all_posts(pool.get_ref(), 10, q.page.unwrap_or_default(), id_int).await
+                get_all_posts(
+                    pool.get_ref(),
+                    10,
+                    q.page.unwrap_or_default(),
+                    id_int,
+                    q.search.to_owned().unwrap_or_default(),
+                )
+                .await
             }
         },
     };

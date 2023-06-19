@@ -28,13 +28,14 @@
 
   .header {
     display: flex;
+    flex-direction: column;
 
     .data {
-      border-radius: $border-radius $border-inner $border-inner $border-radius;
+      border-radius: $border-radius $border-inner $border-inner $border-inner;
       background-color: $surface;
       min-width: 0;
       flex: 1;
-      border-right: $border;
+      border-bottom: $border;
 
       .info {
         display: flex;
@@ -91,14 +92,18 @@
 
     .options {
       background-color: $surface;
-      border-radius: $border-inner $border-radius $border-radius $border-inner;
+      border-radius: $border-inner $border-inner $border-radius $border-radius;
       // margin-left: 1px;
-      border-left: $border;
+      border-top: $border;
       float: right;
       display: flex;
-      flex-direction: column;
-      justify-content: center;
+      flex-direction: row;
       overflow: clip;
+      
+      .left,
+      .comments{
+        margin-right: auto;
+      }
 
       .like,
       .dislike {

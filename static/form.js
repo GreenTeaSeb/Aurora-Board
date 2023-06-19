@@ -8,11 +8,11 @@ const prevent_file = (e) => {
     body: formData, // event.target is the form
   })
     .then((res) => {
-      if (!res.redirected)
+      if (!res.ok)
         return res.text().then((text) => {
           throw new Error(text);
         });
-      window.location.replace(res.url);
+        window.location.replace('/');
     })
     .catch((err) => {
       errors.innerText = err;
@@ -27,11 +27,11 @@ const prevent = (e) => {
     body: new URLSearchParams(new FormData(e.target)),
   })
     .then((res) => {
-      if (!res.redirected)
+      if (!res.ok)
         return res.text().then((text) => {
           throw new Error(text);
         });
-      window.location.replace(res.url);
+        window.location.replace('/');
     })
     .catch((err) => {
 	errors.style.display = "block"

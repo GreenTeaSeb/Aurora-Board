@@ -4,6 +4,7 @@
 #topnav {
   background-color: $surface;
   display: flex;
+  border-bottom: $border;
   // align-items: stretch;
   justify-content: center;
   flex-direction: row;

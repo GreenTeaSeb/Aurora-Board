@@ -9,73 +9,63 @@
 		<!-- <script src="/home.js" defer></script> -->
 		<script src="/sidebars.js" defer></script>
 		<script src="/like.js" defer></script>
+		<script src="/post.js" defer></script>
 </head>
 
 <body>
 	<% include!("./navbar.html"); %>
+
+	<dialog  id="newreply-modal" class="modal">
+		<form action="" method="post" class="panel">    
+		<div class="title section">New Reply</div>
+		<div class="inputs section">  	
+			<label class="textarea">	
+			<textarea name="text" id="text" rows="10" cols="80" maxlength="20000" placeholder="text" required></textarea>
+			</label>
+		</div>
+		<div class="buttons section">
+			<button type="reset" class="cancel button hover" onclick="close_modal(this)">Cancel</button>
+			<button type="submit" class="submit button main-button">Post</button>
+		</div>
+		</form>	
+	</dialog>
+
 		<main id="content" class="">
 			<aside id="sidebar-left" class="sidebar">
 				<% include!("./leftside.html"); %>
 			</aside>
 			<div id="posts" data-cur-page="posts">
-				<div class="page">
-					<div class="post">
-						<div class="header">
-							<div class="data">
-								<a class="info" href=<%=format!("\"/users/{}\"",
-									post.poster_id) %>>
-									<img class="pfp" src=<%=post.poster_pfp%> alt="">
-									<p class="title">
-										<%= post.title %>
-									</p>
-									<p class="time">
-										<%= super::post::time_msg(post.created_at)%>
-									</p>
-								</a>
-								<div class="text">
-									<pre><%= post.text %></pre>
-								</div>
-							</div>
-							<div class=<%=format!("\" options {}\"" , match status {Some(true)=> "liked",Some(false) =>
-								"disliked",_ => ""})%>
-								>
-								<form action=<%=format!("\"/posts/{}/like\"" ,post.id)%> method="post" class="hover"
-									onsubmit="like(event,this.parentElement)">
-									<label>
-										<input type="submit">
-										<svg class="like" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-											viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-											stroke-linecap="round" stroke-linejoin="round"
-											class="feather feather-thumbs-up">
-											<path
-												d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3">
-											</path>
-										</svg>
-									</label>
-								</form>
-								<form action=<%=format!("\"/posts/{}/dislike\"", post.id)%> method="post" class="hover"
-									onsubmit="dislike(event,this.parentElement)">
-									<label>
-										<input type="submit">
-										<svg class="dislike" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-											viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-											stroke-linecap="round" stroke-linejoin="round"
-											class="feather feather-thumbs-down">
-											<path
-												d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17">
-											</path>
-										</svg>
-									</label>
-								</form>
-
-							</div>
-
-						</div>
-					</div>
+				<div class="page"><% include!("./posttemplate.html");%></div>
+				<div id="replies" class="page">
+					<% for reply in replies { %>
+						<% include!("./replytemplate.html");%>
+					<%};%>
 				</div>
 				<% include!("./loading.html");%>
 			</div>
 			<aside id="sidebar-right" class="sidebar">
+				<div id="board-info" class="panel">
+					<div id="info" class="section">
+						<h2 class="title unselectable">
+							<%= post.title %>
+						</h2>
+					</div>
+					<div id="options" class="section">
+					</div>
+					<div class="section">
+
+						<div id="newreply-button" class="button hover">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+								fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+								stroke-linejoin="round" class="feather feather-plus-square">
+								<rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+								<line x1="12" y1="8" x2="12" y2="16"></line>
+								<line x1="8" y1="12" x2="16" y2="12"></line>
+							</svg>
+							Reply to topic
+						</div>
+					</div>
+				</div>
 			</aside>
 		</main>
 </body>

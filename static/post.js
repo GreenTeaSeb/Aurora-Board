@@ -39,7 +39,8 @@ const get_posts = async () => {
     const res = await fetch(url);
     const html = await res.text();
     let html_parsed = parser.parseFromString(html, "text/html");
-    const page = html_parsed.querySelector(".page");
+    const page = html_parsed.querySelector("#replies");
+    // console.log(page.childElementCount);
     if (!page.childElementCount) {
       // alert("no more posts")
       posts_loading.style.display = "none";
@@ -52,37 +53,17 @@ const get_posts = async () => {
   }
 };
 
+main.addEventListener("scroll", get_posts);
+
+
 const close_modal = (m) => {
   m.closest(".modal").close();
 };
 
 try {
-  const newpost_button = document.getElementById("newpost-button");
-  const newpost_modal = document.getElementById("newpost-modal");
-  newpost_button.addEventListener("click", () => {
-    newpost_modal.showModal();
+  const newreply_button = document.getElementById("newreply-button");
+  const newreply_modal = document.getElementById("newreply-modal");
+  newreply_button.addEventListener("click", () => {
+    newreply_modal.showModal();
   });
 } catch (e) {}
-
-try {
-  const boardimg_modal = document.getElementById("boardimg-modal");
-  const boardimg_button = document.getElementById("boardimg-edit");
-  boardimg_button.addEventListener("click", () => {
-    boardimg_modal.showModal();
-  });
-} catch (e) {
-  /* handle error */
-}
-
-try {
-  const edit_modal = document.getElementById("edit-modal");
-  const edit_button = document.getElementById("edit-button");
-  edit_button.addEventListener("click", () => {
-    edit_modal.showModal();
-  });
-} catch (e) {
-  /* handle error */
-}
-
-main.addEventListener("scroll", get_posts);
-document.getElementById('search-space').value = "page"

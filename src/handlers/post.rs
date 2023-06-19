@@ -1,14 +1,25 @@
 use super::{
-    user::check_if_joined_board, user::get_by_id, user::get_user_boards, user::User,
-    user::UserBoards, utils::sanitize_html,
+    reply::ReplyData,
+    reply::{get_n_replies, reply_status, Reply},
+    user::{check_if_joined_board, check_if_owner},
+    user::get_by_id,
+    user::get_user_boards,
+    user::User,
+    user::UserBoards,
+    utils::sanitize_html,
 };
 use actix_identity::Identity;
-use actix_web::{self, web, HttpMessage, HttpRequest, HttpResponse, Responder};
+use actix_web::{
+    self,
+    web::{self, post, Query},
+    HttpMessage, HttpRequest, HttpResponse, Responder,
+};
 use anyhow::Result;
-use chrono::Utc;
+use chrono::{offset, Utc};
+use futures::{future::join_all, StreamExt};
 use sailfish::TemplateOnce;
 use serde::{Deserialize, Serialize};
-use sqlx::{FromRow, MySqlPool};
+use sqlx::{pool, FromRow, MySqlPool};
 
 #[derive(Deserialize)]
 pub struct NewPostdata {
@@ -32,17 +43,14 @@ pub struct PostData {
     pub created_at: chrono::DateTime<chrono::Utc>,
     pub poster_id: u32,
     pub poster_pfp: String,
+    pub board_name: String,
     pub title: String,
     pub text: String,
 }
 
-#[derive(TemplateOnce)]
-#[template(path = "post.html", escape = false)]
-struct PostTemplate {
-    user: Result<User>,
-    user_boards: Vec<UserBoards>,
-    post: PostData,
-    status: Option<bool>
+#[derive(Deserialize, Debug)]
+pub struct PostQuery {
+    page: Option<u32>,
 }
 
 //LOGIC
@@ -91,7 +99,7 @@ on duplicate key update  is_like = ?
     .await
 }
 
-pub async fn is_liked(id: u32, post_id: u32, pool: &MySqlPool) -> Option<bool> {
+pub async fn post_status(id: u32, post_id: u32, pool: &MySqlPool) -> Option<bool> {
     if let Ok(val) = sqlx::query!(
         r#"select is_like from likes
 where user_id = ? and post_id = ?;"#,
@@ -111,8 +119,9 @@ pub async fn get_post_by_id(id: u32, pool: &MySqlPool) -> Result<PostData> {
     Ok(sqlx::query_as!(
         PostData,
         r#"
-	SELECT posts.id, posts.created_at,posts.poster_id,posts.title,posts.text, users.pfp as poster_pfp FROM  posts
-        INNER JOIN users ON users.id = posts.poster_id
+	SELECT posts.id, posts.created_at,posts.poster_id,posts.title,posts.text, users.pfp as poster_pfp, boards.name as board_name  FROM  posts
+    INNER JOIN users ON users.id = posts.poster_id
+    INNER JOIN boards on boards.id = posts.board_id
 	WHERE posts.id = ? 
         "#,
         id
@@ -120,6 +129,21 @@ pub async fn get_post_by_id(id: u32, pool: &MySqlPool) -> Result<PostData> {
     .fetch_one(pool)
     .await?)
 }
+
+async fn delete_post_by_id(
+    id: u32,
+    pool: &MySqlPool,
+) -> Result<sqlx::mysql::MySqlQueryResult, sqlx::Error> {
+    sqlx::query!(
+        r#"
+            delete from posts where id = ?
+        "#,
+        id
+    )
+    .execute(pool)
+    .await
+}
+
 
 //API
 pub async fn newpost(
@@ -186,9 +210,54 @@ pub async fn dislike_post(pool: web::Data<MySqlPool>, req: HttpRequest) -> impl 
     }
 }
 
+pub async fn delete_post(pool: web::Data<MySqlPool>, req: HttpRequest) -> impl Responder {
+    let user_id = req.extensions().get::<u32>().unwrap().to_owned();
+    let post_id = req
+    .match_info()
+    .get("post")
+    .unwrap_or_default()
+    .parse()
+    .unwrap_or_default();
+
+    let post = get_post_by_id(post_id, pool.as_ref()).await;
+
+    if let Err(e) = post {
+            return HttpResponse::InternalServerError().body(e.to_string())
+    }
+
+    if let Ok(post) = post {
+        if post.poster_id != user_id && !check_if_owner(user_id, &post.board_name, pool.as_ref()).await.unwrap_or(false) {
+            return HttpResponse::Forbidden().body("Only the owner of the post or owner of the board can delete posts!")
+        }
+    }
+
+    match delete_post_by_id(post_id, pool.as_ref()).await {
+        Ok(_) => HttpResponse::Ok().finish(),
+        Err(err) => HttpResponse::InternalServerError().body(err.to_string())
+    }
+}
+
+
 //FRONTEND
 
-pub async fn post_pg(id: Identity, req: HttpRequest, pool: web::Data<MySqlPool>) -> impl Responder {
+#[derive(TemplateOnce)]
+#[template(path = "post.html", escape = false)]
+struct PostTemplate {
+    user: Result<User>,
+    user_boards: Vec<UserBoards>,
+    post: PostData,
+    poster_data: User,
+    is_owner: bool,
+    status: Option<bool>,
+    replies: Vec<ReplyData>,
+}
+
+pub async fn post_pg(
+    id: Identity,
+    req: HttpRequest,
+    pool: web::Data<MySqlPool>,
+    q: Query<PostQuery>,
+) -> impl Responder {
     let post = req
         .match_info()
         .get("post")
@@ -201,18 +270,46 @@ pub async fn post_pg(id: Identity, req: HttpRequest, pool: web::Data<MySqlPool>)
         .parse()
         .unwrap_or_default();
 
+    let offset = q.page.unwrap_or_default();
+
     let user_data = get_by_id(&id, pool.get_ref()).await;
 
     let post_data = match get_post_by_id(post, pool.get_ref()).await {
         Ok(d) => d,
         Err(x) => return HttpResponse::NotFound().body(x.to_string()),
     };
+    let poster_data = match get_by_id(&post_data.poster_id, pool.get_ref()).await {
+        Ok(d) => d,
+        Err(x) => return HttpResponse::NotFound().body(x.to_string()),
+    };
+
+    let replies_db = get_n_replies(post, pool.get_ref(), 10, offset).await;
+    let mut replies: Vec<ReplyData> = Vec::new();
+    for reply in replies_db {
+        let poster_data = match get_by_id(&reply.poster_id, pool.get_ref()).await {
+            Ok(d) => d,
+            Err(x) => continue,
+        };
+        let reply_data = ReplyData {
+            id: reply.id,
+            created_at: reply.created_at,
+            poster_data: poster_data,
+            text: reply.text,
+            status: reply_status(id, reply.id, pool.get_ref()).await,
+        };
+        replies.push(reply_data);
+    }
+
+    let board_owner = check_if_owner(id, &post_data.board_name, pool.get_ref()).await.unwrap_or(false);
 
     let temp = PostTemplate {
         user: user_data,
         user_boards: get_user_boards(id, pool.get_ref()).await,
         post: post_data,
-        status: is_liked(id, post, pool.get_ref()).await
+        poster_data: poster_data,
+        is_owner: board_owner,
+        status: post_status(id, post, pool.get_ref()).await,
+        replies: replies,
     };
     HttpResponse::Found().body(temp.render_once().unwrap())
 }
